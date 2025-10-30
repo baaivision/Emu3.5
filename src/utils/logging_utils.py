@@ -5,9 +5,9 @@
 # Created Date: Wednesday December 18th 2024
 # Author: Zhengxiong Luo
 # Contact: <zxluo@baai.ac.cn>
-# 
+#
 # Last Modified: Wednesday December 18th 2024 3:03:32 pm
-# 
+#
 # Copyright (c) 2024 Beijing Academy of Artificial Intelligence (BAAI)
 # All rights reserved.
 # -----
@@ -32,7 +32,7 @@ def setup_print_file(file):
     builtins.print = print
 
 
-def  (log_dir="./", log_name="log"):
+def setup_logger(log_dir="./", log_name="log"):
     logfile = osp.join(
         log_dir,
         f'{log_name}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log',
