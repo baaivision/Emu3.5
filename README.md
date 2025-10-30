@@ -10,34 +10,7 @@ Emu3.5 Team, BAAI
 <img src="./assets/arch.png" class="interpolation-image" alt="arch." height="100%" width="100%" />
 </div>
 
-🌍 Emu3.5 Highlights
-
-🧠 Unified World Modeling
-Natively predicts the next state across vision and language, enabling consistent world understanding and generation.
-
-🧩 End-to-End Pretraining Objective
-Trained with a unified next-token prediction over interleaved vision-language data, jointly modeling perception and semantics.
-
-📚 10-Trillion-Token Corpus
-Pre-trained on 10T+ vision-language tokens from sequential internet video frames and transcripts, forming rich spatiotemporal grounding.
-
-🔄 Native Multimodal I/O
-Accepts and generates interleaved visual-text sequences without task-specific adapters or modality segregation.
-
-🎯 Reinforcement Learning Post-Training
-Large-scale RL fine-tuning enhances multimodal reasoning, compositionality, and generative fidelity.
-
-⚡ Discrete Diffusion Adaptation (DiDA)
-Transforms token-by-token decoding into bidirectional parallel prediction, achieving ≈20× faster per-image inference with no quality drop.
-
-🖼️ Versatile Generation Abilities
-Supports long-horizon vision-language generation, any-to-image (X2I) synthesis, and text-rich image creation.
-
-🌐 Generalizable World Modeling
-Demonstrates spatiotemporally consistent exploration and open-world embodied manipulation across diverse scenarios.
-
-🏆 Performance & Comparison
-Matches Gemini 2.5 Flash Image (Nano Banana) in image generation/editing and outperforms on interleaved generation tasks.
+We introduce Emu3.5, a large-scale multimodal world model that natively predicts the next state across vision and language. Emu3.5 is pre-trained end-to-end with a unified next-token prediction objective on a corpus of vision-language interleaved data containing over 10 trillion tokens, primarily derived from sequential frames and transcripts of internet videos. The model naturally accepts interleaved vision-language inputs and generates interleaved vision-language outputs. Emu3.5 is further post-trained with large-scale reinforcement learning to enhance multi-modal reasoning and generation. To improve inference efficiency, we propose Discrete Diffusion Adaptation (DiDA), which converts token-by-token decoding into bidirectional parallel prediction, accelerating per-image inference by about 20×without sacrificing performance. Emu3.5 exhibits strong native multimodal capabilities, including long-horizon vision-language generation, any-to-image (X2I) generation, and complex text-rich image generation. It also exhibits generalizable world-modeling abilities, enabling spatiotemporally consistent world exploration and open-world embodied manipulation across diverse scenarios and tasks. For comparison, Emu3.5 achieves performance comparable to Gemini 2.5 Flash Image (Nano Banana) on image generation and editing tasks and demonstrates superior results on a suite of interleaved generation tasks.
 
 <div align='center'>
 <img src="./assets/co.png" class="interpolation-image" alt="arch." height="90%" width="90%" />
