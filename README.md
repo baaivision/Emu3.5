@@ -6,8 +6,14 @@ Emu3.5 Team, BAAI
 [Project Page](https://emu.world/) | [🤗HF Models](https://huggingface.co/collections/BAAI/emu35) | [Paper](https://emu.world/Emu35_tech_report.pdf)
 </div>
 
+
 <div align='center'>
 <img src="./assets/arch.png" class="interpolation-image" alt="arch." height="100%" width="100%" />
+</div>
+
+
+<div align='center'>
+<img src="./assets/co.png" class="interpolation-image" alt="arch." height="90%" width="90%" />
 </div>
 
 
@@ -24,9 +30,6 @@ Emu3.5 Team, BAAI
 |  🏆 | **Performance Benchmark**                | Matches **Gemini 2.5 Flash Image (Nano Banana)** on **image generation/editing**, and **outperforms** on **interleaved generation tasks**. |
 
 
-<div align='center'>
-<img src="./assets/co.png" class="interpolation-image" alt="arch." height="90%" width="90%" />
-</div>
 
 ## Table of Contents
 
