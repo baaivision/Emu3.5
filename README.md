@@ -10,7 +10,6 @@ Emu3.5 Team, BAAI
 <img src="./assets/arch.png" class="interpolation-image" alt="arch." height="100%" width="100%" />
 </div>
 
-✨ Emu3.5 — Native Multimodal World Model — Highlights：
 
 |  🔹 | **Core Concept**                         | **Description**                                                                                                                            |
 | :-: | :--------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
