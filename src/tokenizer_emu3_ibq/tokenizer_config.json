@@ -1,0 +1,10 @@
+{
+  "model_max_length": 1000000000000000000,
+  "tokenizer_class": "Emu3Tokenizer",
+  "auto_map": {
+    "AutoTokenizer": [
+      "tokenization_emu3.Emu3Tokenizer",
+      null
+      ]
+  }
+}

@@ -1,0 +1,10 @@
+torch>=2.6.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+transformers==4.48.2
+accelerate>=0.20.0
+pillow>=9.0.0
+numpy>=1.21.0
+tqdm>=4.64.0
+protobuf>=3.20.0
+tiktoken>=0.12.0
