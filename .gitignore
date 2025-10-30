@@ -1,0 +1,55 @@
+### Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+### Packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+wheels/
+
+### Environments
+.env
+.venv
+env/
+venv/
+
+### Notebooks
+.ipynb_checkpoints/
+
+### IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+### OS
+.DS_Store
+Thumbs.db
+
+### Project outputs and large artifacts
+outputs/
+logs/
+video_outputs/
+video_case/
+checkpoints/
+weights/
+*.log
+*.mp4
+
+### Model files (large)
+*.bin
+*.safetensors
+*.h5
+*.ckpt
+*.pt
+*.pth
+
+### Temp
+tmp/
+temp/
+_trash/
