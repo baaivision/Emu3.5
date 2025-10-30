@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# Copyright 2025 BAAI. and/or its affiliates.
+# SPDX-License-Identifier: Apache-2.0
 
 import re
 from PIL import Image

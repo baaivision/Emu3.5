@@ -1,3 +1,5 @@
+# Copyright 2025 BAAI. and/or its affiliates.
+# SPDX-License-Identifier: Apache-2.0
 """Tokenization classes for Emu3."""
 
 import base64
