@@ -5,8 +5,8 @@ from pathlib import Path
 from src.utils.logging_utils import setup_logger
 cfg_name = Path(__file__).stem
 
-model_path = "./weights/emu3.5_32b" # download from hf
-vq_path = "./weights/vision_tokenizer" # download from hf
+model_path = "./weights/Emu3.5" # download from hf
+vq_path = "./weights/Emu3.5-VisionTokenizer" # download from hf
 
 tokenizer_path = "./src/tokenizer_emu3_ibq"
 vq_type = "ibq"
@@ -17,7 +17,7 @@ task_type = "story"
 use_image = True
 
 # saving config
-exp_name = "emu3p5_32b"
+exp_name = "emu3p5"
 save_path = f"./outputs/{exp_name}"
 save_to_proto = True
 setup_logger(save_path)
@@ -26,7 +26,7 @@ hf_device = "auto"
 vq_device = "cuda:0"
 streaming = False
 unconditional_type = "no_text"
-classifier_free_guidance = 3.0
+classifier_free_guidance = 3.0 #  (recommended）Emu3.5 interleaved: 3, T2I/X2I: 2; Emu3.5-Image T2I/X2I: 5
 max_new_tokens = 32768
 image_area = 518400
 
