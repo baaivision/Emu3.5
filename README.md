@@ -64,7 +64,8 @@ pip install flash_attn==2.8.3 --no-build-isolation
 Edit `configs/config.py` to set:
 
 - Paths: `model_path`, `vq_path`
-- Task template: `task_type in {t2i, x2i, howto, story, explore, vla}`, `use_image` controls `<|IMAGE|>` usage (set to true when reference images are provided)
+- Task template: `task_type in {t2i, x2i, howto, story, explore, vla}`
+- Input image: `use_image` (True to provide reference images, controls <|IMAGE|> token); set `reference_image` in each prompt to specify the image path.
 - Sampling: `sampling_params` (classifier_free_guidance, temperature, top_k/top_p, etc.)
 
 ### Run Inference
