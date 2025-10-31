@@ -46,6 +46,9 @@ Emu3.5 Team, BAAI
 | Emu3.5-Image                | [🤗 HF link](https://huggingface.co/BAAI/Emu3.5-Image/tree/main) |
 | Emu3.5-VisionTokenizer     | [🤗 HF link](https://huggingface.co/BAAI/Emu3.5-VisionTokenizer/tree/main) |
 
+**Emu3.5** handles general tasks, while **Emu3.5-Image** focuses on high-quality image generation and editing.
+
+
 ## 2. Quick Start
 
 ### Environment Setup
