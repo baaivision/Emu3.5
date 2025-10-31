@@ -89,10 +89,15 @@ python src/utils/vis_proto.py --input <input_proto_file> --output <output_dir>
 
 ## 4. Citation
 
-<!-- ```bibtex
-@misc{emu352025,
-  title  = {Emu3.5},
-  year   = {2025},
+```bibtex
+@misc{cui2025emu35nativemultimodalmodels,
+      title={Emu3.5: Native Multimodal Models are World Learners}, 
+      author={Yufeng Cui and Honghao Chen and Haoge Deng and Xu Huang and Xinghang Li and Jirong Liu and Yang Liu and Zhuoyan Luo and Jinsheng Wang and Wenxuan Wang and Yueze Wang and Chengyuan Wang and Fan Zhang and Yingli Zhao and Ting Pan and Xianduo Li and Zecheng Hao and Wenxuan Ma and Zhuo Chen and Yulong Ao and Tiejun Huang and Zhongyuan Wang and Xinlong Wang},
+      year={2025},
+      eprint={2510.26583},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2510.26583}, 
 }
-``` -->
+```
 
