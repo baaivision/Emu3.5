@@ -82,9 +82,9 @@ python src/utils/vis_proto.py --input <input_proto_file> --output <output_dir>
 
 ## 3. Schedule
 
-- [x] Inference Code
+- [x] Inference Code(auto-regressive version)
 - [ ] Advanced Image Decoder
-- [ ] Discrete Diffusion Adaptation(DiDA)
+- [ ] Discrete Diffusion Adaptation(DiDA) Inference & Weights
 
 
 ## 4. Citation
