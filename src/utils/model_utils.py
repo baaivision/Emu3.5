@@ -36,6 +36,7 @@ def build_emu3p5(
         torch_dtype=torch.bfloat16,
         device_map=device_map,
         attn_implementation="flash_attention_2",
+        # attn_implementation="eager", # if you cann't install flash_attention
     )
     model.eval()
     
