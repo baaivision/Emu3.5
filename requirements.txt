@@ -8,5 +8,6 @@ numpy>=1.21.0
 tqdm>=4.64.0
 protobuf>=3.20.0
 tiktoken>=0.12.0
-imageio>=2.31.0
+imageio==2.37.0
+imageio-ffmpeg==0.6.0
 omegaconf==2.3.0

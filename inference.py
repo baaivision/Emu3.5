@@ -3,14 +3,12 @@
 
 import argparse
 import importlib as imp
-import io
 import os
 import os.path as osp
 from pathlib import Path
 import random
-
+from time import sleep
 from PIL import Image
-import numpy as np
 import torch
 from tqdm import tqdm
 
@@ -35,9 +33,7 @@ def inference(
     tokenizer,
     vq_model,
 ):
-    sampling_params = cfg.sampling_params
     save_path = cfg.save_path
-
 
     os.makedirs(save_path, exist_ok=True)
     os.makedirs(f"{save_path}/proto", exist_ok=True)
@@ -45,13 +41,14 @@ def inference(
 
     for name, question in tqdm(cfg.prompts, total=len(cfg.prompts)):
         if osp.exists(f"{save_path}/proto/{name}.pb"):
-            print(f"result already exists, skipping {name}")
+            print(f"[WARNING] Result already exists, skipping {name}", flush=True)
             continue
 
         torch.cuda.empty_cache()
 
         reference_image = None
         if not isinstance(question, str):
+            print(f"[INFO] Reference images are provided")
             if isinstance(question["reference_image"], list):
                 reference_image = []
                 for img in question["reference_image"]:
@@ -59,7 +56,9 @@ def inference(
             else:
                 reference_image = Image.open(question["reference_image"]).convert("RGB")
             question = question["prompt"]
-
+        else:
+            print(f"[INFO] No reference images are provided")
+        
         proto_writer.clear()
         proto_writer.extend([["question", question]])
         if reference_image is not None:
@@ -68,6 +67,7 @@ def inference(
         success = True
         prompt = cfg.template.format(question=question)
 
+        print(f"[INFO] Handling prompt: {prompt}")
         if reference_image is not None:
             if isinstance(reference_image, list):
                 image_str = ""
@@ -92,14 +92,15 @@ def inference(
             full_unc_ids = tokenizer.encode(cfg.img_unc_prompt, return_tensors="pt", add_special_tokens=False).to(model.device)
         else:
             full_unc_ids = None
-
-        for result in generate(cfg, model, tokenizer, input_ids, unconditional_ids, full_unc_ids):
+        
+        for result_tokens in generate(cfg, model, tokenizer, input_ids, unconditional_ids, full_unc_ids):
             try:
-                result = tokenizer.decode(result, skip_special_tokens=False)
+                result = tokenizer.decode(result_tokens, skip_special_tokens=False)
                 mm_out = multimodal_decode(result, tokenizer, vq_model)
                 proto_writer.extend(mm_out)
             except Exception as e:
                 success = False
+                print(f"[ERROR] Failed to generate token sequence: {e}")
                 break
 
         if not success:
@@ -139,7 +140,7 @@ def main():
         vq_device=vq_device,
         **getattr(cfg, "diffusion_decoder_kwargs", {}),
     )
-
+    print(f"[INFO] Model loaded successfully")
     cfg.special_token_ids = {}
     for k, v in cfg.special_tokens.items():
         cfg.special_token_ids[k] = tokenizer.encode(v)[0]
@@ -152,7 +153,7 @@ def main():
         tokenizer=tokenizer,
         vq_model=vq_model,
     )
-
+    print(f"[INFO] Inference finished")
 
 if __name__ == "__main__":
     main()

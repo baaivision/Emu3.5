@@ -107,10 +107,10 @@ Protobuf outputs are written to `outputs/<exp_name>/proto/`. For better throughp
 
 ### Visualize Protobuf Outputs
 
-To visualize generated protobuf files:
+To visualize generated protobuf files (--video: Generate video demo for interleaved content):
 
 ```bash
-python src/utils/vis_proto.py --input <input_proto_file> --output <output_dir>
+python src/utils/vis_proto.py --input <input_proto_file> --output <output_dir> [--video]
 ```
 
 ## 3. Schedule

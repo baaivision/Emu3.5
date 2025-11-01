@@ -10,10 +10,6 @@ from PIL import Image
 
 from src.proto import emu_pb as story_pb
 
-def has_chinese(s: str) -> bool:
-    return re.search(r'[\u4e00-\u9fff]', s) is not None
-
-
 class ProtoWriter:
     
     def __init__(self):
