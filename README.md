@@ -78,6 +78,29 @@ Edit `configs/config.py` to set:
 python inference.py --cfg configs/config.py
 ```
 
+
+#### Example Configurations by Task
+Below are example commands for different tasks.
+Make sure to set CUDA_VISIBLE_DEVICES according to your available GPUs.
+
+
+```bash
+# 🖼️ Text-to-Image (T2I) task
+CUDA_VISIBLE_DEVICES=0 python inference.py --cfg configs/example_config_t2i.py
+
+# 🔄 Any-to-Image (X2I) task
+CUDA_VISIBLE_DEVICES=0,1 python inference.py --cfg configs/example_config_x2i.py
+
+# 🎯 Visual Guidance task
+CUDA_VISIBLE_DEVICES=0,1 python inference.py --cfg configs/example_config_visual_guidance.py
+
+# 📖 Visual Narrative task
+CUDA_VISIBLE_DEVICES=0,1 python inference.py --cfg configs/example_config_visual_narrative.py
+
+# After running inference, the model will generate results in protobuf format (.pb files) for each input prompt.
+```
+
+
 Protobuf outputs are written to `outputs/<exp_name>/proto/`. For better throughput, we recommend ≥2 GPUs.
 
 ### Visualize Protobuf Outputs
