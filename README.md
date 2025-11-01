@@ -97,8 +97,6 @@ CUDA_VISIBLE_DEVICES=0,1 python inference.py --cfg configs/example_config_visual
 # 📖 Visual Narrative task
 CUDA_VISIBLE_DEVICES=0,1 python inference.py --cfg configs/example_config_visual_narrative.py
 
-# 🌍 World Exploration task
-CUDA_VISIBLE_DEVICES=0,1 python inference.py --cfg configs/example_config_world_exploration.py
 
 # After running inference, the model will generate results in protobuf format (.pb files) for each input prompt.
 ```
