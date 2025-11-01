@@ -112,7 +112,7 @@ def main():
     if isinstance(cfg.prompts, dict):
         cfg.prompts = [(n, p) for n, p in cfg.prompts.items()]
     else:
-        cfg.prompts = [(f"story_{idx:03d}", p) for idx, p in enumerate(cfg.prompts)]
+        cfg.prompts = [(f"{idx:03d}", p) for idx, p in enumerate(cfg.prompts)]
 
     cfg.prompts = [(n, p) for n, p in cfg.prompts if not osp.exists(f"{cfg.save_path}/proto/{n}.pb")]
     cfg.prompts = cfg.prompts[rank::world_size]
