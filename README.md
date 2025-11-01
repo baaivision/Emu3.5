@@ -46,7 +46,13 @@ Emu3.5 Team, BAAI
 | Emu3.5-Image                | [🤗 HF link](https://huggingface.co/BAAI/Emu3.5-Image/tree/main) |
 | Emu3.5-VisionTokenizer     | [🤗 HF link](https://huggingface.co/BAAI/Emu3.5-VisionTokenizer/tree/main) |
 
-**Emu3.5** handles general tasks(including interleaved generation and image generation/editing), while **Emu3.5-Image** focuses on high-quality image generation/editing.
+
+
+*Note:*
+
+- Model **Emu3.5** handles general tasks (including interleaved generation and image generation/editing), while model **Emu3.5-Image** focuses on high-quality image generation/editing.
+- Current **Emu3.5** and **Emu3.5-Image** are naive next-token prediction models without DiDA acceleration. Stay tuned for DiDA weights.
+
 
 
 ## 2. Quick Start
@@ -86,9 +92,9 @@ python src/utils/vis_proto.py --input <input_proto_file> --output <output_dir>
 
 ## 3. Schedule
 
-- [x] Inference Code(auto-regressive version)
+- [x] Inference Code (NTP Version)
 - [ ] Advanced Image Decoder
-- [ ] Discrete Diffusion Adaptation(DiDA) Inference & Weights
+- [ ] Discrete Diffusion Adaptation (DiDA) Inference & Weights
 
 
 ## 4. Citation
