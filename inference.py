@@ -64,7 +64,12 @@ def inference(
         prompt = cfg.template.format(question=question)
 
         if reference_image is not None:
-            image_str = build_image(reference_image, cfg, tokenizer, vq_model)
+            if isinstance(reference_image, list):
+                image_str = ""
+                for img in reference_image:
+                    image_str += build_image(reference_image, cfg, tokenizer, vq_model)
+            else:
+                image_str = build_image(reference_image, cfg, tokenizer, vq_model)
             prompt = prompt.replace("<|IMAGE|>", image_str)
             unc_prompt = cfg.unc_prompt.replace("<|IMAGE|>", image_str)
         else:
