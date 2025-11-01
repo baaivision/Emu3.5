@@ -87,6 +87,7 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenProcessor(LogitsProcess
         self.first_in_image = True
         self.in_image = False
         self.in_visual = False
+        self.image_nums = 0
 
         self.allowed_tokens_control = allowed_tokens_control
 
@@ -194,10 +195,11 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenProcessor(LogitsProcess
             # height and width have been generated; confirm h and w
             if input_ids[0][-1] == IMG:
                 self.in_visual = True
+                self.image_nums += 1
+                print(f"[INFO] Generating image#{self.image_nums}...")
                 if self.first_in_image or not self.force_same_image_size:
                     self.parse_hw(input_ids)
                     self.first_in_image = False
-
 
                 # the first visual token
                 scores = self.apply_cfg(scores, unc_scores, self.guidance_scale, self.image_cfg_scale)
