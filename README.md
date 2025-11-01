@@ -47,12 +47,10 @@ Emu3.5 Team, BAAI
 | Emu3.5-VisionTokenizer     | [🤗 HF link](https://huggingface.co/BAAI/Emu3.5-VisionTokenizer/tree/main) |
 
 
-
 *Note:*
-
-- Model **Emu3.5** handles general tasks (including interleaved generation and image generation/editing), while model **Emu3.5-Image** focuses on high-quality image generation/editing.
-- Current **Emu3.5** and **Emu3.5-Image** are naive next-token prediction models without DiDA acceleration. Stay tuned for DiDA weights.
-
+- **Emu3.5** supports general tasks, including interleaved generation and image generation/editing.  
+- **Emu3.5-Image** focuses on high-quality image generation and editing.  
+- Both **Emu3.5** and **Emu3.5-Image** are currently pure next-token prediction models without DiDA acceleration. Stay tuned for DiDA weights.
 
 
 ## 2. Quick Start
