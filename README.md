@@ -69,7 +69,7 @@ Edit `configs/config.py` to set:
 
 - Paths: `model_path`, `vq_path`
 - Task template: `task_type in {t2i, x2i, howto, story, explore, vla}`
-- Input image: `use_image` (True to provide reference images, controls <|IMAGE|> token); set `reference_image` in each prompt to specify the image path.
+- Input image: `use_image` (True to provide reference images, controls <|IMAGE|> token); set `reference_image` in each prompt to specify the image path. For x2i task, 'reference_image' should be a list rather than a single path to be compatible for multi-image input.
 - Sampling: `sampling_params` (classifier_free_guidance, temperature, top_k/top_p, etc.)
 
 ### Run Inference
