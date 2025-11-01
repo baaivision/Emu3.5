@@ -30,18 +30,37 @@ max_new_tokens = 5120
 image_area = 1048576
 
 
+
+# prompts config
+# If use_image=True, each item should be a dict with {"prompt", "reference_image"}. reference_image should be a list of image (maximum 3 images).
+# If use_image=False, each item is a plain text string.
+
+_prompts_base = [
+    {
+        "prompt": "Change the silver car to bright orange.",
+        "reference_image": ["assets/ref_car.jpeg"], 
+    },
+]
+
+if use_image:
+    prompts = _prompts_base
+else:
+    prompts = [p["prompt"] for p in _prompts_base]
+
 def build_unc_and_template(task: str, with_image: bool):
     # System prompt header and role formatting remain consistent
     task_str = task.lower()
     if with_image:
         unc_p = "<|extra_203|>You are a helpful assistant. USER: <|IMAGE|> ASSISTANT: <|extra_100|>"
-        tmpl = "<|extra_203|>You are a helpful assistant for %s task. USER: {question}<|IMAGE|> ASSISTANT: <|extra_100|>" % task_str
+        tmpl = "<|extra_203|>You are a helpful assistant for %s task. USER: <|IMAGE|>{question} ASSISTANT: <|extra_100|>" % task_str
     else:
         unc_p = "<|extra_203|>You are a helpful assistant. USER:  ASSISTANT: <|extra_100|>"
         tmpl = "<|extra_203|>You are a helpful assistant for %s task. USER: {question} ASSISTANT: <|extra_100|>" % task_str
     return unc_p, tmpl
 
 unc_prompt, template = build_unc_and_template(task_type, use_image)
+
+# sampling paras config
 
 sampling_params = dict(
     use_cache=True,
@@ -92,19 +111,3 @@ special_tokens = dict(
 )
 
 seed = 6666
-
-# prompts config
-# If use_image=True, each item should be a dict with {"prompt", "reference_image"}.
-# If use_image=False, each item is a plain text string.
-
-_prompts_base = [
-    {
-        "prompt": "Change the silver car to bright orange.",
-        "reference_image": "assets/ref_car.jpeg",
-    },
-]
-
-if use_image:
-    prompts = _prompts_base
-else:
-    prompts = [p["prompt"] for p in _prompts_base]
