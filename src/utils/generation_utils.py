@@ -120,7 +120,6 @@ def multimodal_decode(
 
     multimodal_output = []
     chunks = re.split(pattern, outputs)
-    print(f"[DEBUG] Chunks: {chunks}")
     for c in chunks:
         if len(c) == 0:
             continue
