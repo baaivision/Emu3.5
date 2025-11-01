@@ -58,6 +58,7 @@ Emu3.5 Team, BAAI
 ### Environment Setup
 
 ```bash
+# Python 3.10 or higher is required.
 git clone https://github.com/baaivision/Emu3.5
 cd Emu3.5
 pip install -r requirements.txt
