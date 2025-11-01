@@ -52,7 +52,12 @@ def inference(
 
         reference_image = None
         if not isinstance(question, str):
-            reference_image = Image.open(question["reference_image"])
+            if isinstance(question["reference_image"], list):
+                reference_image = []
+                for img in question["reference_image"]:
+                    reference_image.append(Image.open(img).convert("RGB"))
+            else:
+                reference_image = Image.open(question["reference_image"]).convert("RGB")
             question = question["prompt"]
 
         proto_writer.clear()
