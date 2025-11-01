@@ -30,8 +30,9 @@ def main():
         print(story.question, file=f)
 
     if len(story.reference_images) > 0:
-        with open(f"{output_path}/000_reference_image.png", 'wb') as f:
-            f.write(story.reference_images[0].image.image_data)
+        for i in range(len(story.reference_images)):
+            with open(f"{output_path}/{i:03d}_reference_image.png", 'wb') as f:
+                f.write(story.reference_images[i].image.image_data)
 
     idx = 1
     for c in story.clips:
