@@ -39,7 +39,7 @@ def wrap_text(draw, text, font, max_width):
     return lines
 
 
-def plot_string(string, font_path="src/proto/assets/cangerjinkai.ttf", font_size=40, image_size=(512, 512), bg_color="white", text_color="black"):
+def plot_string(string, font_path="src/proto/assets/cangerjinkai.ttf", font_size=80, image_size=(512, 512), bg_color="white", text_color="black"):
     img = Image.new("RGB", image_size, color=bg_color)
     draw = ImageDraw.Draw(img)
 
