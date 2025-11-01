@@ -74,7 +74,7 @@ def non_streaming_generate(
     )
 
     gen_token_ids = token_ids[:, input_ids_len:]
-    return gen_token_ids[0].cpu().numpy()
+    return gen_token_ids[0].detach().cpu().numpy()
 
 
 def build_logits_processor(
@@ -114,12 +114,13 @@ def multimodal_decode(
     pattern = re.compile(
         rf"({re.escape(tokenizer.bog_token)}.*?{re.escape(tokenizer.eog_token)}|"
         rf"{re.escape(tokenizer.boc_token)}.*?{re.escape(tokenizer.eoc_token)}|"
-        rf"{re.escape(tokenizer.boi_token)}.*?{re.escape(tokenizer.eoi_token)})"
+        rf"{re.escape(tokenizer.boi_token)}.*?{re.escape(tokenizer.eoi_token)})",
+        re.DOTALL
     )
 
     multimodal_output = []
     chunks = re.split(pattern, outputs)
-
+    print(f"[DEBUG] Chunks: {chunks}")
     for c in chunks:
         if len(c) == 0:
             continue
@@ -157,7 +158,7 @@ def decode_image(image_string, tokenizer, vision_tokenizer):
         h, w = image.shape
         image = vision_tokenizer.decode_code(image[None], shape=(1, h, w, 256)).float()
         image = image[0].permute(1, 2, 0)
-        image = Image.fromarray(((image + 1.0) * 127.5).clamp(0, 255).cpu().numpy().astype(np.uint8))
+        image = Image.fromarray(((image + 1.0) * 127.5).clamp(0, 255).detach().cpu().numpy().astype(np.uint8))
         return image
     except Exception as ex:
         print(f"decode image failed {ex}")
