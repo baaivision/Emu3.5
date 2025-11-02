@@ -30,6 +30,27 @@ classifier_free_guidance = 5.0 # For Emu3.5 model: we recommend set to 2
 max_new_tokens = 5120
 image_area = 1048576
 
+aspect_ratios = {
+    "4:3": "55*73",
+    "21:9": "41*97",
+    "16:9": "47*85",
+    "3:2": "52*78",
+    "1:1": "64*64",
+    "3:4": "73*55",
+    "9:16": "85*47",
+    "2:3": "78*52",   
+    "default": "55*73",
+}
+
+# The user inputs the aspect ratio, default 4:3
+aspect_ratio = "default"
+target_height, target_width = map(int, aspect_ratios[aspect_ratio].split('*'))
+
+if target_height is not None and target_width is not None:
+    print(f"Aspect Ratio = {aspect_ratio}")
+    print(f"target_height = {target_height}, target_width = {target_width}")
+    print(f"token area = {target_height * target_width}")
+
 
 def build_unc_and_template(task: str, with_image: bool):
     # System prompt header and role formatting remain consistent
