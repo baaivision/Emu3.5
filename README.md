@@ -47,10 +47,16 @@ Emu3.5 Team, BAAI
 | Emu3.5-VisionTokenizer     | [🤗 HF link](https://huggingface.co/BAAI/Emu3.5-VisionTokenizer/tree/main) |
 
 
-*Note:*
-- **Emu3.5** supports general tasks, including interleaved generation and image generation/editing.  
-- **Emu3.5-Image** focuses on high-quality image generation and editing.  
-- Both **Emu3.5** and **Emu3.5-Image** are currently pure next-token prediction models without DiDA acceleration. Stay tuned for DiDA weights.
+*Note:*  
+- **Emu3.5** supports general multimodal predictions, including interleaved image-text generation and image editing.
+- **Emu3.5-Image** is further optimized for high-fidelity text-to-image generation and single/multiple image editing.  
+- Both models are pure next-token predictors without DiDA acceleration (each image may take several minutes to generate).  
+- ⚡ **Stay tuned for DiDA-accelerated weights.**
+
+> 💡 **Usage tip:**  
+> For **interleaved image-text generation**, use **Emu3.5**.  
+> For **single-image generation or editing**, use **Emu3.5-Image** for the best quality.
+
 
 
 ## 2. Quick Start
@@ -70,7 +76,7 @@ Edit `configs/config.py` to set:
 
 - Paths: `model_path`, `vq_path`
 - Task template: `task_type in {t2i, x2i, howto, story, explore, vla}`
-- Input image: `use_image` (True to provide reference images, controls <|IMAGE|> token); set `reference_image` in each prompt to specify the image path. For x2i task, 'reference_image' should be a list rather than a single path to be compatible for multi-image input.
+- Input image: `use_image` (True to provide reference images, controls <|IMAGE|> token); set `reference_image` in each prompt to specify the image path. For x2i task, 'reference_image' should be a list rather than a single path to be compatible with multi-image input.
 - Sampling: `sampling_params` (classifier_free_guidance, temperature, top_k/top_p, etc.)
 
 ### Run Inference
@@ -107,7 +113,7 @@ Protobuf outputs are written to `outputs/<exp_name>/proto/`. For better throughp
 
 ### Visualize Protobuf Outputs
 
-To visualize generated protobuf files (--video: Generate video demo for interleaved content):
+To visualize generated protobuf files (--video: Generate video visualizations for interleaved output):
 
 ```bash
 python src/utils/vis_proto.py --input <input_proto_file> --output <output_dir> [--video]
