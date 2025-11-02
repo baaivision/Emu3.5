@@ -26,7 +26,7 @@ hf_device = "auto"
 vq_device = "cuda:0"
 streaming = False
 unconditional_type = "no_text"
-classifier_free_guidance = 5.0 # For Emu3.5 model: we recommend set to 2
+classifier_free_guidance = 5.0
 max_new_tokens = 5120
 image_area = 1048576
 
@@ -38,18 +38,28 @@ aspect_ratios = {
     "1:1": "64*64",
     "3:4": "73*55",
     "9:16": "85*47",
-    "2:3": "78*52",   
+    "2:3": "78*52",
     "default": "55*73",
+    "auto": None,
 }
 
-# The user inputs the aspect ratio, default 4:3
-aspect_ratio = "default"
-target_height, target_width = map(int, aspect_ratios[aspect_ratio].split('*'))
 
-if target_height is not None and target_width is not None:
-    print(f"Aspect Ratio = {aspect_ratio}")
-    print(f"target_height = {target_height}, target_width = {target_width}")
-    print(f"token area = {target_height * target_width}")
+def get_target_size(aspect_ratio: str):
+    value = aspect_ratios.get(aspect_ratio, None)
+    if value is None:
+        return None, None
+
+    h, w = map(int, value.split("*"))
+    return h, w
+
+
+# --- example usage ---
+aspect_ratio = "default"     # User input, which can be replaced by "4:3", "1:1", "auto" etc.
+
+target_height, target_width = get_target_size(aspect_ratio)
+
+print(f"Aspect Ratio = {aspect_ratio}")
+print(f"target_height = {target_height}, target_width = {target_width}")
 
 
 def build_unc_and_template(task: str, with_image: bool):

@@ -35,8 +35,8 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenProcessor(LogitsProcess
         allowed_tokens_control: bool = True,
         force_same_image_size: bool = True,
         unconditional_type: str = "no_text", # options: no_text, no_prev_text, no_prev_modal, no_text_img_cfg, etc.
-        target_height: Optional[int] = None,  # 新增参数用于指定目标高度
-        target_width: Optional[int] = None,   # 新增参数用于指定目标宽度
+        target_height: Optional[int] = None,  # added parameter is used to specify the target height
+        target_width: Optional[int] = None,   # added parameter is used to specify the target width
         image_cfg_scale: float = 1.0,
     ):
         self.guidance_scale = guidance_scale
@@ -93,10 +93,12 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenProcessor(LogitsProcess
 
         self.allowed_tokens_control = allowed_tokens_control
 
-        self.height = target_height  # 使用指定的高度
-        self.width = target_width    # 使用指定的宽度
+        self.height = target_height 
+        self.width = target_width
         if self.height is not None and self.width is not None:
-            print(f"height: {self.height}, width: {self.width}")
+            print(f"user defined: height: {self.height}, width: {self.width}")
+        else:
+            print(f"auto height, width")
         self.hw_tokens = None
         self.force_same_image_size = force_same_image_size
         self.unconditional_type = unconditional_type
@@ -220,7 +222,7 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenProcessor(LogitsProcess
             # not yet at IMG token: we are generating h x w tokens
             else:
                 if self.height is not None and self.width is not None:
-                    # 如果指定了尺寸，强制生成对应的h和w tokens
+                    # If the size is specified, the corresponding h and w tokens will be forcibly generated.
                     boi_idx = self.find_last_token_index(input_ids[0], BOI)
                     hw_idx = input_ids.shape[1] - boi_idx
                     hw_tokens = self.tokenizer.encode(f"{str(self.height)}*{str(self.width)}", add_special_tokens=False)
@@ -398,8 +400,8 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenProcessor(LogitsProcess
 
 class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenWithDifferentialTopKProcessor(UnbatchedClassifierFreeGuidanceLogitsForVisualTokenProcessor):
     """
-    扩展原有的CFG处理器，添加差异化TopK功能
-    在生成文字token和图片token时使用不同的topk、top_p、temperature参数
+    Extend the original CFG processor and add the differentiated TopK function.
+    Use different topk, top_p, and temperature parameters when generating text tokens and image tokens.
     """
 
     def __init__(
@@ -418,7 +420,7 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenWithDifferentialTopKPro
         target_height: Optional[int] = None,
         target_width: Optional[int] = None,
         image_cfg_scale: float = 1.0,
-        # 新增的差异化topk参数
+        # added differentiated topk parameter
         use_differential_sampling: bool = False,
         text_top_k: int = 1024,
         image_top_k: int = 10240,
@@ -428,7 +430,7 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenWithDifferentialTopKPro
         image_temperature: float = 1.0,
         **kwargs,
     ):
-        # 调用父类初始化
+
         super().__init__(
             guidance_scale=guidance_scale,
             model=model,
