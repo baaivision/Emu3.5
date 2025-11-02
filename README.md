@@ -55,7 +55,7 @@ Emu3.5 Team, BAAI
 
 > 💡 **Usage tip:**  
 > For **interleaved image-text generation**, use **Emu3.5**.  
-> For **single-image generation or editing**, use **Emu3.5-Image** for the best quality.
+> For **single-image generation** (T2I and X2I editing), use **Emu3.5-Image** for the best quality.
 
 
 
