@@ -62,7 +62,11 @@ def inference(
         proto_writer.clear()
         proto_writer.extend([["question", question]])
         if reference_image is not None:
-            proto_writer.extend([["reference_image", reference_image]])
+            if isinstance(reference_image, list):
+                for idx, img in enumerate(reference_image):
+                    proto_writer.extend([[f"reference_image", img]])
+            else:
+                proto_writer.extend([["reference_image", reference_image]])
 
         success = True
         prompt = cfg.template.format(question=question)
@@ -72,7 +76,7 @@ def inference(
             if isinstance(reference_image, list):
                 image_str = ""
                 for img in reference_image:
-                    image_str += build_image(reference_image, cfg, tokenizer, vq_model)
+                    image_str += build_image(img, cfg, tokenizer, vq_model)
             else:
                 image_str = build_image(reference_image, cfg, tokenizer, vq_model)
             prompt = prompt.replace("<|IMAGE|>", image_str)
