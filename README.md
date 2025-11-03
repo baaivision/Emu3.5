@@ -48,7 +48,7 @@ Emu3.5 Team, BAAI
 
 
 *Note:*  
-- **Emu3.5** supports general-purpose multimodal predictions, including interleaved image-text generation and T2I/X2I tasks.
+- **Emu3.5** supports general-purpose multimodal predictions, including interleaved image-text generation and single-image generation (T2I/X2I) tasks.
 - **Emu3.5-Image** is a model focused on T2I/X2I tasks for best performance on these scenarios.
 - Both models are pure next-token predictors without DiDA acceleration (each image may take several minutes to generate).  
 - ⚡ **Stay tuned for DiDA-accelerated weights.**
