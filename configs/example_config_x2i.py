@@ -36,7 +36,7 @@ image_area = 1048576
 _prompts_base = [
     {
         "prompt": "As shown in the second figure: The ripe strawberry rests on a green leaf in the garden. Replace the chocolate truffle in first image with ripe strawberry from 2nd image",
-        "reference_image": ["/share/project/wyz/datasets/images/image_edit/images_old/images/subject_d/subject_d_33/0/0.png", "/share/project/wyz/datasets/images/image_edit/images_old/images/subject_d/subject_d_33/0/1.png"], 
+        "reference_image": ["./assets/ref_0.png", "./assets/ref_1.png"], 
     },
 ]
 
