@@ -21,12 +21,13 @@ def generate(
     input_ids,
     unconditional_ids,
     full_unconditional_ids=None,
+    force_same_image_size=True,
 ):
     if cfg.streaming:
         raise NotImplementedError("Not supported streaming generation")
         # yield from streaming_generate(cfg, model, tokenizer, input_ids, unconditional_ids, full_unconditional_ids)
     else:
-        yield non_streaming_generate(cfg, model, tokenizer, input_ids, unconditional_ids, full_unconditional_ids)
+        yield non_streaming_generate(cfg, model, tokenizer, input_ids, unconditional_ids, full_unconditional_ids, force_same_image_size)
 
 
 def streaming_generate(
@@ -47,6 +48,7 @@ def non_streaming_generate(
     input_ids,
     unconditional_ids,
     full_unconditional_ids=None,
+    force_same_image_size=True,
 ):
     input_ids_len = input_ids.shape[1]
 
@@ -58,6 +60,7 @@ def non_streaming_generate(
             model,
             tokenizer,
             full_unconditional_ids,
+            force_same_image_size=force_same_image_size,
         )
     )
 
@@ -83,6 +86,7 @@ def build_logits_processor(
     model,
     tokenizer,
     full_unconditional_ids=None,
+    force_same_image_size=True,
 ):
     logits_processor = UnbatchedClassifierFreeGuidanceLogitsForVisualTokenWithDifferentialTopKProcessor(
         guidance_scale=cfg.classifier_free_guidance,
@@ -99,6 +103,7 @@ def build_logits_processor(
         image_top_k=cfg.sampling_params["image_top_k"],
         image_top_p=cfg.sampling_params["image_top_p"],
         image_temperature=cfg.sampling_params["image_temperature"],
+        force_same_image_size=force_same_image_size,
     )
 
     return logits_processor

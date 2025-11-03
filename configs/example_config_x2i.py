@@ -5,8 +5,8 @@ from pathlib import Path
 from src.utils.logging_utils import setup_logger
 cfg_name = Path(__file__).stem
 
-model_path = "./weights/Emu3.5-image" # download from hf
-vq_path = "./weights/Emu3.5-VisionTokenizer" # download from hf
+model_path = "/share/project/jswang/projects/unirl/release/Emu3.5/weights/emu3.5_32b_image" # download from hf
+vq_path = "/share/project/jswang/projects/unirl/release/Emu3.5/weights/vision_tokenizer" # download from hf
 
 tokenizer_path = "./src/tokenizer_emu3_ibq"
 vq_type = "ibq"
@@ -29,16 +29,14 @@ classifier_free_guidance = 3.0 # For Emu3.5 model: we recommend set to 2
 max_new_tokens = 5120
 image_area = 1048576
 
-
-
 # prompts config
 # If use_image=True, each item should be a dict with {"prompt", "reference_image"}. reference_image should be a list of image (maximum 3 images).
 # If use_image=False, each item is a plain text string.
 
 _prompts_base = [
     {
-        "prompt": "Change the silver car to bright orange.",
-        "reference_image": ["assets/ref_car.jpeg"], 
+        "prompt": "As shown in the second figure: The ripe strawberry rests on a green leaf in the garden. Replace the chocolate truffle in first image with ripe strawberry from 2nd image",
+        "reference_image": ["/share/project/wyz/datasets/images/image_edit/images_old/images/subject_d/subject_d_33/0/0.png", "/share/project/wyz/datasets/images/image_edit/images_old/images/subject_d/subject_d_33/0/1.png"], 
     },
 ]
 

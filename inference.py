@@ -17,7 +17,6 @@ from src.utils.generation_utils import generate, multimodal_decode
 from src.utils.painting_utils import ProtoWriter
 from src.utils.input_utils import build_image, smart_resize
 
-
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--cfg", default="", type=str)
@@ -25,7 +24,6 @@ def parse_args():
     parser.add_argument("--worker_id", default=0, type=int)
     args = parser.parse_args()
     return args
-
 
 def inference(
     cfg,
@@ -48,16 +46,17 @@ def inference(
 
         reference_image = None
         if not isinstance(question, str):
-            print(f"[INFO] Reference images are provided")
             if isinstance(question["reference_image"], list):
+                print(f"[INFO] {len(question['reference_image'])} reference images are provided")
                 reference_image = []
                 for img in question["reference_image"]:
                     reference_image.append(Image.open(img).convert("RGB"))
             else:
+                print (f"[INFO] 1 reference image is provided")
                 reference_image = Image.open(question["reference_image"]).convert("RGB")
             question = question["prompt"]
         else:
-            print(f"[INFO] No reference images are provided")
+            print(f"[INFO] No reference image is provided")
         
         proto_writer.clear()
         proto_writer.extend([["question", question]])
@@ -96,8 +95,14 @@ def inference(
             full_unc_ids = tokenizer.encode(cfg.img_unc_prompt, return_tensors="pt", add_special_tokens=False).to(model.device)
         else:
             full_unc_ids = None
+            
+        if isinstance(reference_image, list):
+            if len(reference_image) > 1:
+                force_same_image_size = False
+            else:
+                force_same_image_size = True
         
-        for result_tokens in generate(cfg, model, tokenizer, input_ids, unconditional_ids, full_unc_ids):
+        for result_tokens in generate(cfg, model, tokenizer, input_ids, unconditional_ids, full_unc_ids, force_same_image_size):
             try:
                 result = tokenizer.decode(result_tokens, skip_special_tokens=False)
                 mm_out = multimodal_decode(result, tokenizer, vq_model)
@@ -111,7 +116,6 @@ def inference(
             continue
 
         proto_writer.save(f"{save_path}/proto/{name}.pb")
-
 
 def main():
     args = parse_args()
