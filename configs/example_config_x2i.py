@@ -5,10 +5,10 @@ from pathlib import Path
 from src.utils.logging_utils import setup_logger
 cfg_name = Path(__file__).stem
 
-model_path = "/share/project/jswang/projects/unirl/release/Emu3.5/weights/emu3.5_32b_image" # download from hf
-vq_path = "/share/project/jswang/projects/unirl/release/Emu3.5/weights/vision_tokenizer" # download from hf
+model_path = "path_to_emu3.5_model" # download from hf
+vq_path = "path_to_vq_model" # download from hf
 
-tokenizer_path = "./src/tokenizer_emu3_ibq"
+tokenizer_path = "path_to_tokenizer"
 vq_type = "ibq"
 
 task_type = "x2i"
