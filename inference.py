@@ -95,12 +95,11 @@ def inference(
             full_unc_ids = tokenizer.encode(cfg.img_unc_prompt, return_tensors="pt", add_special_tokens=False).to(model.device)
         else:
             full_unc_ids = None
-            
-        if isinstance(reference_image, list):
-            if len(reference_image) > 1:
-                force_same_image_size = False
-            else:
-                force_same_image_size = True
+
+        force_same_image_size = True
+        # for x2i task, if multiple reference images are provided as a list, force_same_image_size should be False
+        if isinstance(reference_image, list) and len(reference_image) > 1:
+            force_same_image_size = False   
         
         for result_tokens in generate(cfg, model, tokenizer, input_ids, unconditional_ids, full_unc_ids, force_same_image_size):
             try:
