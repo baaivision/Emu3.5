@@ -35,6 +35,10 @@ def main():
     with open(f"{output_path}/000_question.txt", 'w') as f:
         print(story.question, file=f)
 
+    if story.summary and story.summary.strip():
+        with open(f"{output_path}/000_global_cot.txt", 'w') as f:
+            print(story.summary, file=f)
+
     idx = 1
     
     if len(story.reference_images) > 0:
@@ -50,6 +54,9 @@ def main():
             for im_idx, im in enumerate(s.images):
                 with open(f"{output_path}/{idx:03d}_{im_idx:02d}_image.png", 'wb') as f:
                     f.write(im.image.image_data)
+                if im.chain_of_thought and im.chain_of_thought.strip():
+                    with open(f"{output_path}/{idx:03d}_{im_idx:02d}_image_cot.txt", 'w') as f:
+                        print(im.chain_of_thought, file=f)
             idx += 1
     
     if args.video:
