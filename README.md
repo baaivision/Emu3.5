@@ -120,6 +120,23 @@ To visualize generated protobuf files (--video: Generate video visualizations fo
 python src/utils/vis_proto.py --input <input_proto_file> --output <output_dir> [--video]
 ```
 
+Expected output directory layout (example):
+
+```text
+results/
+├── 000_question.txt
+├── 000_global_cot.txt
+├── 001_text.txt
+├── 001_00_image.png
+├── 001_00_image_cot.txt
+├── 002_text.txt
+├── 002_00_image.png
+├── ...
+└── video.mp4              # only when --video is enabled
+```
+
+Each `*_text.txt` stores decoded segments, `*_image.png` stores generated frames, and matching `*_image_cot.txt` keeps image-level chain-of-thought notes when available.
+
 ## 3. Schedule
 
 - [x] Inference Code (NTP Version)
