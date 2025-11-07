@@ -48,14 +48,14 @@ Emu3.5 Team, BAAI
 
 
 *Note:*  
-- **Emu3.5** supports general multimodal predictions, including interleaved image-text generation and image editing.
-- **Emu3.5-Image** is further optimized for high-fidelity text-to-image generation and single/multiple image editing.  
+- **Emu3.5** supports general-purpose multimodal predictions, including interleaved image-text generation and single-image generation (T2I/X2I) tasks.
+- **Emu3.5-Image** is a model focused on T2I/X2I tasks for best performance on these scenarios.
 - Both models are pure next-token predictors without DiDA acceleration (each image may take several minutes to generate).  
 - ⚡ **Stay tuned for DiDA-accelerated weights.**
 
 > 💡 **Usage tip:**  
 > For **interleaved image-text generation**, use **Emu3.5**.  
-> For **single-image generation** (T2I and X2I editing), use **Emu3.5-Image** for the best quality.
+> For **single-image generation** (T2I and X2I), use **Emu3.5-Image** for the best quality.
 
 
 
@@ -76,7 +76,7 @@ Edit `configs/config.py` to set:
 
 - Paths: `model_path`, `vq_path`
 - Task template: `task_type in {t2i, x2i, howto, story, explore, vla}`
-- Input image: `use_image` (True to provide reference images, controls <|IMAGE|> token); set `reference_image` in each prompt to specify the image path. For x2i task, 'reference_image' should be a list rather than a single path to be compatible with multi-image input.
+- Input image: `use_image` (True to provide reference images, controls <|IMAGE|> token); set `reference_image` in each prompt to specify the image path. For x2i task, we recommand using `reference_image` as a list containing single/multiple image paths to be compatible with multi-image input.
 - Sampling: `sampling_params` (classifier_free_guidance, temperature, top_k/top_p, etc.)
 
 ### Run Inference
