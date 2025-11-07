@@ -43,25 +43,43 @@ def plot_string(string, font_path="src/proto/assets/cangerjinkai.ttf", font_size
     img = Image.new("RGB", image_size, color=bg_color)
     draw = ImageDraw.Draw(img)
 
-    if font_path:
-        try:
-            font = ImageFont.truetype(font_path, font_size)
-        except:
-            print(f"Failed to load font from {font_path}")
-            font = ImageFont.load_default()
-    else:
-        font = ImageFont.load_default()
+    margin = 100
+    max_width = max(image_size[0] - 2 * margin, 1)
+    max_height = max(image_size[1] - 2 * margin, 1)
 
-    max_width = image_size[0] - 20
+    def load_font(size):
+        if font_path:
+            try:
+                return ImageFont.truetype(font_path, size)
+            except Exception:
+                print(f"Failed to load font from {font_path}")
+        return ImageFont.load_default()
+
+    font = load_font(font_size)
     lines = wrap_text(draw, string, font, max_width)
-    line_height = draw.textbbox((0, 0), "A", font=font)[3]
-    total_text_height = line_height * len(lines)
-    y_offset = (image_size[1] - total_text_height) // 2
+    line_height = draw.textbbox((0, 0), "Ay", font=font)[3]
+    total_text_height = line_height * max(len(lines), 1)
+
+    if total_text_height > max_height:
+        for size in range(font_size - 2, 9, -2):
+            font = load_font(size)
+            lines = wrap_text(draw, string, font, max_width)
+            line_height = draw.textbbox((0, 0), "Ay", font=font)[3]
+            total_text_height = line_height * max(len(lines), 1)
+            if total_text_height <= max_height:
+                break
+        else:
+            font = ImageFont.load_default()
+            lines = wrap_text(draw, string, font, max_width)
+            line_height = draw.textbbox((0, 0), "Ay", font=font)[3]
+            total_text_height = line_height * max(len(lines), 1)
+
+    y_offset = max(margin, (image_size[1] - total_text_height) // 2)
 
     for line in lines:
         bbox = draw.textbbox((0, 0), line, font=font)
         text_width = bbox[2] - bbox[0]
-        x_offset = (image_size[0] - text_width) // 2
+        x_offset = max(margin, (image_size[0] - text_width) // 2)
         draw.text((x_offset, y_offset), line, fill=text_color, font=font)
         y_offset += line_height
 
