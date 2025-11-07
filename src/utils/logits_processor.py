@@ -35,6 +35,8 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenProcessor(LogitsProcess
         allowed_tokens_control: bool = True,
         force_same_image_size: bool = True,
         unconditional_type: str = "no_text", # options: no_text, no_prev_text, no_prev_modal, no_text_img_cfg, etc.
+        target_height: Optional[int] = None,  # added parameter is used to specify the target height
+        target_width: Optional[int] = None,   # added parameter is used to specify the target width
         image_cfg_scale: float = 1.0,
     ):
         self.guidance_scale = guidance_scale
@@ -91,8 +93,12 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenProcessor(LogitsProcess
 
         self.allowed_tokens_control = allowed_tokens_control
 
-        self.height = None
-        self.width = None
+        self.height = target_height 
+        self.width = target_width
+        if self.height is not None and self.width is not None:
+            print(f"user defined: height: {self.height}, width: {self.width}")
+        else:
+            print(f"auto height, width")
         self.hw_tokens = None
         self.force_same_image_size = force_same_image_size
         self.unconditional_type = unconditional_type
@@ -174,6 +180,7 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenProcessor(LogitsProcess
             vis_idx = input_ids.shape[1] - img_idx
             # eoi
             if vis_idx == self.height * (self.width + 1):
+                # print(f"in visual and generate eoi", flush=True)
                 mask = torch.full_like(scores, -math.inf)
                 mask[:, EOI] = 0
                 scores = scores + mask
@@ -198,8 +205,11 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenProcessor(LogitsProcess
                 self.image_nums += 1
                 print(f"[INFO] Generating image#{self.image_nums}...")
                 if self.first_in_image or not self.force_same_image_size:
-                    self.parse_hw(input_ids)
+                    if self.height is None or self.width is None:  # Only when the size is not specified will the analysis be conducted.
+                        self.parse_hw(input_ids)
                     self.first_in_image = False
+                
+                # print(f"generate image with h: {self.height} and w: {self.width}", flush=True)
 
                 # the first visual token
                 scores = self.apply_cfg(scores, unc_scores, self.guidance_scale, self.image_cfg_scale)
@@ -211,41 +221,59 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenProcessor(LogitsProcess
                 return scores
             # not yet at IMG token: we are generating h x w tokens
             else:
-                if self.first_in_image or not self.force_same_image_size:
-                    # force output format for h x w sequence
+                if self.height is not None and self.width is not None:
+                    # If the size is specified, the corresponding h and w tokens will be forcibly generated.
                     boi_idx = self.find_last_token_index(input_ids[0], BOI)
                     hw_idx = input_ids.shape[1] - boi_idx
+                    hw_tokens = self.tokenizer.encode(f"{str(self.height)}*{str(self.width)}", add_special_tokens=False)
+
+                    if hw_idx <= len(hw_tokens):  # height part
+                        allowed_tokens = [hw_tokens[hw_idx-1]]
+                        print("forced H W allowed_tokens:", allowed_tokens, self.height, self.width, hw_tokens)
+                    else:  # IMG token
+                        allowed_tokens = [IMG]
+                        
                     mask = torch.full_like(scores, -math.inf)
-                    if hw_idx > 5:
-                        mask[:, IMG] = 0
-                        # print(f"generate h and w, mask {hw_idx - 1} IMG", flush=True)
-                    elif hw_idx in (1, 4):
-                        # example mapping: '1' -> token 16, '9' -> token 24
-                        mask[:, 16:25] = 0
-                        # print(f"generate h and w, mask {hw_idx - 1} 1-9", flush=True)
-                    elif hw_idx == 3:
-                        # '*' -> token 9
-                        mask[:, 9] = 0
-                        # print(f"generate h and w, mask {hw_idx - 1} *", flush=True)
-                    elif hw_idx in (2, 5):
-                        # '0' -> token 15, '9' -> token 24
-                        mask[:, 15:25] = 0
-                        # print(f"generate h and w, mask {hw_idx - 1} 0-9", flush=True)
+                    for token in allowed_tokens:
+                        mask[:, token] = 0
                     scores = scores + mask
                     return scores
                 else:
-                    # force same image size: must reproduce previous h and w tokens
-                    boi_idx = self.find_last_token_index(input_ids[0], BOI)
-                    hw_idx = input_ids.shape[1] - boi_idx
-                    mask = torch.full_like(scores, -math.inf)
-                    if hw_idx > len(self.hw_tokens):
-                        mask[:, IMG] = 0
-                        # print(f"generate h and w, mask {hw_idx - 1} IMG", flush=True)
+                    if self.first_in_image or not self.force_same_image_size:
+                        # force output format for h x w sequence
+                        boi_idx = self.find_last_token_index(input_ids[0], BOI)
+                        hw_idx = input_ids.shape[1] - boi_idx
+                        mask = torch.full_like(scores, -math.inf)
+                        if hw_idx > 5:
+                            mask[:, IMG] = 0
+                            print(f"generate h and w, mask {hw_idx - 1} IMG", flush=True)
+                        elif hw_idx in (1, 4):
+                            # example mapping: '1' -> token 16, '9' -> token 24
+                            mask[:, 16:25] = 0
+                            print(f"generate h and w, mask {hw_idx - 1} 1-9", flush=True)
+                        elif hw_idx == 3:
+                            # '*' -> token 9
+                            mask[:, 9] = 0
+                            print(f"generate h and w, mask {hw_idx - 1} *", flush=True)
+                        elif hw_idx in (2, 5):
+                            # '0' -> token 15, '9' -> token 24
+                            mask[:, 15:25] = 0
+                            print(f"generate h and w, mask {hw_idx - 1} 0-9", flush=True)
+                        scores = scores + mask
+                        return scores
                     else:
-                        mask[:, self.hw_tokens[hw_idx - 1]] = 0
-                        # print(f"generate h and w, mask {hw_idx - 1} {self.hw_tokens[hw_idx - 1]}", flush=True)
-                    scores = scores + mask
-                    return scores
+                        # force same image size: must reproduce previous h and w tokens
+                        boi_idx = self.find_last_token_index(input_ids[0], BOI)
+                        hw_idx = input_ids.shape[1] - boi_idx
+                        mask = torch.full_like(scores, -math.inf)
+                        if hw_idx > len(self.hw_tokens):
+                            mask[:, IMG] = 0
+                            print(f"generate h and w, mask {hw_idx - 1} IMG", flush=True)
+                        else:
+                            mask[:, self.hw_tokens[hw_idx - 1]] = 0
+                            print(f"generate h and w, mask {hw_idx - 1} {self.hw_tokens[hw_idx - 1]}", flush=True)
+                        scores = scores + mask
+                        return scores
 
     def in_text_logits_processor(self, input_ids, scores):
         # for text tokens, do not apply CFG here
@@ -273,7 +301,7 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenProcessor(LogitsProcess
 
         # Decode tokens to string and parse dimensions
         hw_str = self.tokenizer.decode(self.hw_tokens)
-        # print(f"hw_str: {hw_str}, hw_tokens: {self.hw_tokens}", flush=True)
+        print(f"hw_str: {hw_str}, hw_tokens: {self.hw_tokens}", flush=True)
         h, w = hw_str.split('*')
         self.height = int(h)
         self.width = int(w)
@@ -372,8 +400,8 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenProcessor(LogitsProcess
 
 class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenWithDifferentialTopKProcessor(UnbatchedClassifierFreeGuidanceLogitsForVisualTokenProcessor):
     """
-    扩展原有的CFG处理器，添加差异化TopK功能
-    在生成文字token和图片token时使用不同的topk、top_p、temperature参数
+    Extend the original CFG processor and add the differentiated TopK function.
+    Use different topk, top_p, and temperature parameters when generating text tokens and image tokens.
     """
 
     def __init__(
@@ -389,8 +417,10 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenWithDifferentialTopKPro
         allowed_tokens_control: bool = True,
         force_same_image_size: bool = True,
         unconditional_type: str = "no_text",
+        target_height: Optional[int] = None,
+        target_width: Optional[int] = None,
         image_cfg_scale: float = 1.0,
-        # 新增的差异化topk参数
+        # added differentiated topk parameter
         use_differential_sampling: bool = False,
         text_top_k: int = 1024,
         image_top_k: int = 10240,
@@ -400,7 +430,7 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenWithDifferentialTopKPro
         image_temperature: float = 1.0,
         **kwargs,
     ):
-        # 调用父类初始化
+
         super().__init__(
             guidance_scale=guidance_scale,
             model=model,
@@ -413,6 +443,8 @@ class UnbatchedClassifierFreeGuidanceLogitsForVisualTokenWithDifferentialTopKPro
             allowed_tokens_control=allowed_tokens_control,
             force_same_image_size=force_same_image_size,
             unconditional_type=unconditional_type,
+            target_height=target_height,
+            target_width=target_width,
             **kwargs,
         )
 

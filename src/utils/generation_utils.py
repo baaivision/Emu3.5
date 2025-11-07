@@ -95,6 +95,8 @@ def build_logits_processor(
         model=model,
         tokenizer=tokenizer,
         unconditional_type=cfg.unconditional_type,
+        target_height=getattr(cfg, "target_height", None),
+        target_width=getattr(cfg, "target_width", None),
         image_cfg_scale=getattr(cfg, "image_cfg_scale", 1.0),
         use_differential_sampling=cfg.sampling_params["use_differential_sampling"],
         text_top_k=cfg.sampling_params["text_top_k"],
