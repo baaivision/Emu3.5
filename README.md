@@ -78,6 +78,7 @@ Edit `configs/config.py` to set:
 - Task template: `task_type in {t2i, x2i, howto, story, explore, vla}`
 - Input image: `use_image` (True to provide reference images, controls <|IMAGE|> token); set `reference_image` in each prompt to specify the image path. For x2i task, we recommand using `reference_image` as a list containing single/multiple image paths to be compatible with multi-image input.
 - Sampling: `sampling_params` (classifier_free_guidance, temperature, top_k/top_p, etc.)
+- Aspect Ratio (for t2i task): `aspect_ratio` ("4:3", "21:9", "1:1", "auto" etc..)
 
 ### Run Inference
 
