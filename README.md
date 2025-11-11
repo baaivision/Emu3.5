@@ -137,14 +137,39 @@ results/
 
 Each `*_text.txt` stores decoded segments, `*_image.png` stores generated frames, and matching `*_image_cot.txt` keeps image-level chain-of-thought notes when available.
 
-## 3. Schedule
+## 3. Gradio Demo
+
+We provide two Gradio Demos for different application scenarios:
+
+ Emu3.5-Image Demo —— Interactive interface optimized for Text-to-Image (T2I) and Any-to-Image (X2I) tasks:
+
+```bash
+CUDA_VISIBLE_DEVICES=0,1 python gradio_demo_image.py --host 0.0.0.0 --port 7860
+```
+
+Emu3.5-Interleave Demo —— Launch Emu3.5 Interleave Tasks (Visual Guidance and Visual Narrate) Gradio Demo
+```bash
+CUDA_VISIBLE_DEVICES=0,1 python gradio_demo_interleave.py --host 0.0.0.0 --port 7860
+```
+
+### Features
+
+- Image Generation: Support Text-to-Image Generation and Multimodal Image Generation
+- Interleaved Generation: Support long-sequence creation with alternating image and text generation
+- Multiple Aspect Ratios for T2I: 9 preset aspect ratios (4:3, 16:9, 1:1, etc.) plus auto mode
+- Chain-of-Thought Display: Automatically parse and format model's internal thinking process
+- Real-time Streaming: Stream text and image generation with live updates
+
+
+
+## 4. Schedule
 
 - [x] Inference Code (NTP Version)
 - [ ] Advanced Image Decoder
 - [ ] Discrete Diffusion Adaptation (DiDA) Inference & Weights
 
 
-## 4. Citation
+## 5. Citation
 
 ```bibtex
 @misc{cui2025emu35nativemultimodalmodels,
