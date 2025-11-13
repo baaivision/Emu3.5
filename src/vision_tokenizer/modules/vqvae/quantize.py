@@ -470,15 +470,20 @@ class IndexPropagationQuantize(nn.Module):
         dim = 1
         ind = soft_one_hot.max(dim, keepdim=True)[1]
         hard_one_hot = torch.zeros_like(logits, memory_format=torch.legacy_contiguous_format).scatter_(dim, ind, 1.0)
-        one_hot = hard_one_hot - soft_one_hot.detach() + soft_one_hot
 
-        z_q = einsum('b n h w, n d -> b d h w', one_hot, embedding)
-        z_q_2 = einsum('b n h w, n d -> b d h w', hard_one_hot, embedding)
+        if self.training:
+            one_hot = hard_one_hot - soft_one_hot.detach() + soft_one_hot
 
-        quant_loss = torch.mean((z_q - z) ** 2) + \
-                     torch.mean((z_q_2.detach() - z) ** 2) + \
-                     torch.mean((z_q_2 - z.detach()) ** 2) * self.beta
-        diff = quant_loss
+            z_q = einsum('b n h w, n d -> b d h w', one_hot, embedding)
+            z_q_2 = einsum('b n h w, n d -> b d h w', hard_one_hot, embedding)
+
+            quant_loss = torch.mean((z_q - z) ** 2) + \
+                        torch.mean((z_q_2.detach() - z) ** 2) + \
+                        torch.mean((z_q_2 - z.detach()) ** 2) * self.beta
+            diff = quant_loss
+        else:
+            diff = 0.0
+            z_q = einsum('b n h w, n d -> b d h w', hard_one_hot, embedding)
 
         if self.use_entropy_loss:
             sample_entropy, avg_entropy, entropy_loss = compute_entropy_loss(
