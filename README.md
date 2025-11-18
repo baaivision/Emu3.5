@@ -112,6 +112,35 @@ CUDA_VISIBLE_DEVICES=0,1 python inference.py --cfg configs/example_config_visual
 
 Protobuf outputs are written to `outputs/<exp_name>/proto/`. For better throughput, we recommend ≥2 GPUs.
 
+
+### Run Inference with vLLM
+
+#### vLLM Enviroment Setup
+
+```bash
+pip install vllm==0.11.0 # Make sure to install vllm version 0.11.0.
+
+cd Emu3.5
+python src/patch/apply.py
+```
+
+#### Example Configurations by Task
+
+```bash
+# 🖼️ Text-to-Image (T2I) task
+CUDA_VISIBLE_DEVICES=0,1 python inference_vllm.py --cfg configs/example_config_t2i.py
+
+# 🔄 Any-to-Image (X2I) task
+CUDA_VISIBLE_DEVICES=0,1 python inference_vllm.py --cfg configs/example_config_x2i.py
+
+# 🎯 Visual Guidance task
+CUDA_VISIBLE_DEVICES=0,1 python inference_vllm.py --cfg configs/example_config_visual_guidance.py
+
+# 📖 Visual Narrative task
+CUDA_VISIBLE_DEVICES=0,1 python inference_vllm.py --cfg configs/example_config_visual_narrative.py
+```
+
+
 ### Visualize Protobuf Outputs
 
 To visualize generated protobuf files (--video: Generate video visualizations for interleaved output):

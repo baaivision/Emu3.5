@@ -1,0 +1,64 @@
+diff --git a/vllm/v1/sample/logits_processor/state.py b/vllm/v1/sample/logits_processor/state.py
+index 0a1196559..68699c8a8 100644
+--- a/vllm/v1/sample/logits_processor/state.py
++++ b/vllm/v1/sample/logits_processor/state.py
+@@ -7,7 +7,8 @@ from typing import TYPE_CHECKING, Optional
+ from vllm.v1.sample.logits_processor.interface import (AddedRequest,
+                                                        BatchUpdate,
+                                                        MovedRequest,
+-                                                       RemovedRequest)
++                                                       RemovedRequest,
++                                                       UpdatedRequest)
+ 
+ if TYPE_CHECKING:
+     from vllm.v1.sample.logits_processor.interface import LogitsProcessor
+@@ -38,16 +39,19 @@ class BatchUpdateBuilder:
+     _is_removed_sorted: bool
+     added: list[AddedRequest]
+     moved: list[MovedRequest]
++    updated: list[UpdatedRequest]
+ 
+     def __init__(
+         self,
+         removed: Optional[list[RemovedRequest]] = None,
+         added: Optional[list[AddedRequest]] = None,
+         moved: Optional[list[MovedRequest]] = None,
++        updated: Optional[list[UpdatedRequest]] = None,
+     ) -> None:
+         self._removed = removed or []
+         self.added = added or []
+         self.moved = moved or []
++        self.updated = updated or []
+         self._is_removed_sorted = False
+ 
+         # Used to track changes in the pooling case
+@@ -109,6 +113,7 @@ class BatchUpdateBuilder:
+         self._removed.clear()
+         self.added.clear()
+         self.moved.clear()
++        self.updated.clear()
+         batch_changed = self.batch_changed
+         self.batch_changed = False
+         return batch_changed
+@@ -126,7 +131,7 @@ class BatchUpdateBuilder:
+         # Reset removal-sorting logic
+         self._is_removed_sorted = False
+         self.batch_changed = False
+-        if not any((self._removed, self.moved, self.added)):
++        if not any((self._removed, self.moved, self.added, self.updated)):
+             # No update; short-circuit
+             return None
+         # Build batch state update
+@@ -135,10 +140,12 @@ class BatchUpdateBuilder:
+             removed=self._removed,
+             moved=self.moved,
+             added=self.added,
++            updated=self.updated,
+         )
+         self._removed = []
+         self.moved = []
+         self.added = []
++        self.updated = []
+         return batch_update
+ 
+ 

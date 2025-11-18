@@ -1,0 +1,29 @@
+diff --git a/vllm/v1/worker/gpu_input_batch.py b/vllm/v1/worker/gpu_input_batch.py
+index 67fb9864b..a31249212 100644
+--- a/vllm/v1/worker/gpu_input_batch.py
++++ b/vllm/v1/worker/gpu_input_batch.py
+@@ -23,6 +23,7 @@ from vllm.v1.sample.metadata import SamplingMetadata
+ from vllm.v1.spec_decode.utils import is_spec_decode_unsupported
+ from vllm.v1.utils import copy_slice
+ from vllm.v1.worker.block_table import MultiGroupBlockTable
++from vllm.v1.core.sched.batch_manager import HybridSchedulerMetadata
+ 
+ 
+ @dataclass
+@@ -44,6 +45,7 @@ class CachedRequestState:
+ 
+     lora_request: Optional[LoRARequest] = None
+     prompt_embeds: Optional[torch.Tensor] = None
++    hybrid_metadata: Optional[HybridSchedulerMetadata] = None
+ 
+     def __post_init__(self):
+         self.num_prompt_tokens = length_from_prompt_token_ids_or_embeds(
+@@ -303,7 +305,7 @@ class InputBatch:
+             # models, to support logitsprocs.
+             self.batch_update_builder.added.append(
+                 (new_req_index, request.sampling_params,
+-                 request.prompt_token_ids, request.output_token_ids))
++                 request.prompt_token_ids, request.output_token_ids, request.hybrid_metadata))
+ 
+         return new_req_index
+ 
