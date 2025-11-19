@@ -117,13 +117,16 @@ Protobuf outputs are written to `outputs/<exp_name>/proto/`. For better throughp
 To visualize generated protobuf files (--video: Generate video visualizations for interleaved output):
 
 ```bash
-python src/utils/vis_proto.py --input <input_proto_file> --output <output_dir> [--video]
+python src/utils/vis_proto.py --input <input_proto_path> [--output <output_dir>] [--video]
 ```
+
+- `--input`: supports a single `.pb` file or a directory; directories are scanned recursively.
+- `--output`: optional; defaults to `<input_dir>/results/<file_stem>` for files, or `<parent_dir_of_input>/results` for directories.
 
 Expected output directory layout (example):
 
 ```text
-results/
+results/<pb_name>/
 ├── 000_question.txt
 ├── 000_global_cot.txt
 ├── 001_text.txt
