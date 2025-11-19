@@ -1,0 +1,3 @@
+-r common.txt
+
+vllm==0.11.0; python_version > '3.11' # torch==2.8.0

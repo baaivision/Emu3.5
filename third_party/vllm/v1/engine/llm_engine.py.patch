@@ -1,0 +1,44 @@
+diff --git a/vllm/v1/engine/llm_engine.py b/vllm/v1/engine/llm_engine.py
+index 2738776e3..a4e728cb8 100644
+--- a/vllm/v1/engine/llm_engine.py
++++ b/vllm/v1/engine/llm_engine.py
+@@ -227,12 +227,36 @@ class LLMEngine:
+                 f"request_id must be a string, got {type(request_id)}")
+ 
+         # Process raw inputs into the request.
+-        prompt_str, request = self.processor.process_inputs(
+-            request_id, prompt, params, arrival_time, lora_request,
+-            tokenization_kwargs, trace_headers, priority)
++        in_hybrid_mode = "uncond_prompt_token_ids" in prompt
++        if in_hybrid_mode:
++            prompt_str, request = self.processor.process_hybrid_inputs(
++                request_id, prompt, params, arrival_time, lora_request,
++                tokenization_kwargs, trace_headers, priority)
++        else:
++            prompt_str, request = self.processor.process_inputs(
++                request_id, prompt, params, arrival_time, lora_request,
++                tokenization_kwargs, trace_headers, priority)
+ 
+         n = params.n if isinstance(params, SamplingParams) else 1
+ 
++        if in_hybrid_mode:
++            assert n == 1, "Unconditional generation does not support n > 1."
++            assert len(request) > 1
++
++            parent_req = ParentRequest(f"cfg_{request_id}", params, num_child_request=len(request))
++            for idx, req in enumerate(request):
++                request_id, params = parent_req.get_child_info(idx)
++                child_request = req if idx == len(request) - 1 else copy(req)
++                child_request.request_id = request_id
++                child_request.sampling_params = params
++
++                # Make a new RequestState and queue.
++                self.output_processor.add_request(child_request, prompt_str,
++                                                  parent_req, idx)
++                # Add the request to EngineCore.
++                self.engine_core.add_request(child_request)
++            return
++
+         if n == 1:
+             # Make a new RequestState and queue.
+             self.output_processor.add_request(request, prompt_str, None, 0)

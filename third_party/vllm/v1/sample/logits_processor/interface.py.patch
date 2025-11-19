@@ -1,0 +1,35 @@
+diff --git a/vllm/v1/sample/logits_processor/interface.py b/vllm/v1/sample/logits_processor/interface.py
+index a84afc2f3..3e768433d 100644
+--- a/vllm/v1/sample/logits_processor/interface.py
++++ b/vllm/v1/sample/logits_processor/interface.py
+@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Optional
+ import torch
+ 
+ from vllm import SamplingParams
++from vllm.v1.core.sched.batch_manager import HybridSchedulerMetadata
+ 
+ if TYPE_CHECKING:
+     from vllm.config import VllmConfig
+@@ -26,12 +27,13 @@ RemovedRequest = int
+ 
+ # (index, params, prompt_tok_ids, output_tok_ids) tuples for new
+ # requests added to the batch.
+-AddedRequest = tuple[int, SamplingParams, Optional[list[int]], list[int]]
++AddedRequest = tuple[int, SamplingParams, Optional[list[int]], list[int], HybridSchedulerMetadata]
+ 
+ # (index 1, index 2, directionality) tuples representing
+ # one-way moves or two-way swaps of requests in batch
+ MovedRequest = tuple[int, int, MoveDirectionality]
+ 
++UpdatedRequest = tuple[int, SamplingParams, HybridSchedulerMetadata]
+ 
+ @dataclass(frozen=True)
+ class BatchUpdate:
+@@ -54,6 +56,7 @@ class BatchUpdate:
+     removed: Sequence[RemovedRequest]
+     added: Sequence[AddedRequest]
+     moved: Sequence[MovedRequest]
++    updated: Sequence[UpdatedRequest]
+ 
+ 
+ class LogitsProcessor(ABC):

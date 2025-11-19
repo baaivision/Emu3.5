@@ -64,10 +64,10 @@ Emu3.5 Team, BAAI
 ### Environment Setup
 
 ```bash
-# Python 3.10 or higher is required.
+# Requires Python 3.12 or higher.
 git clone https://github.com/baaivision/Emu3.5
 cd Emu3.5
-pip install -r requirements.txt
+pip install -r requirements/transformers.txt
 pip install flash_attn==2.8.3 --no-build-isolation
 ```
 ### Configuration
@@ -111,6 +111,44 @@ CUDA_VISIBLE_DEVICES=0,1 python inference.py --cfg configs/example_config_visual
 
 
 Protobuf outputs are written to `outputs/<exp_name>/proto/`. For better throughput, we recommend ≥2 GPUs.
+
+
+### Run Inference with vLLM
+
+#### vLLM Enviroment Setup
+
+1. [Optional Recommendation] Use a virtual environment
+```bash
+conda create -n Emu3p5 python=3.12
+```
+
+2. Install vLLM and apply the patch files.
+```bash
+# Requires Python 3.12 or higher.
+# Recommended: CUDA 12.8.
+pip install -r requirements/vllm.txt
+pip install flash_attn==2.8.3 --no-build-isolation
+
+cd Emu3.5
+python src/patch/apply.py
+```
+
+#### Example Configurations by Task
+
+```bash
+# 🖼️ Text-to-Image (T2I) task
+CUDA_VISIBLE_DEVICES=0,1 python inference_vllm.py --cfg configs/example_config_t2i.py
+
+# 🔄 Any-to-Image (X2I) task
+CUDA_VISIBLE_DEVICES=0,1 python inference_vllm.py --cfg configs/example_config_x2i.py
+
+# 🎯 Visual Guidance task
+CUDA_VISIBLE_DEVICES=0,1 python inference_vllm.py --cfg configs/example_config_visual_guidance.py
+
+# 📖 Visual Narrative task
+CUDA_VISIBLE_DEVICES=0,1 python inference_vllm.py --cfg configs/example_config_visual_narrative.py
+```
+
 
 ### Visualize Protobuf Outputs
 

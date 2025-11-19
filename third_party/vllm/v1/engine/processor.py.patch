@@ -1,0 +1,131 @@
+diff --git a/vllm/v1/engine/processor.py b/vllm/v1/engine/processor.py
+index 843ca9ad6..090686a5c 100644
+--- a/vllm/v1/engine/processor.py
++++ b/vllm/v1/engine/processor.py
+@@ -458,6 +458,126 @@ class Processor:
+             trace_headers=trace_headers,
+         )
+ 
++    def process_hybrid_inputs(
++        self,
++        request_id: str,
++        prompt: PromptType,
++        params: Union[SamplingParams, PoolingParams],
++        arrival_time: Optional[float] = None,
++        lora_request: Optional[LoRARequest] = None,
++        tokenization_kwargs: Optional[dict[str, Any]] = None,
++        trace_headers: Optional[Mapping[str, str]] = None,
++        priority: int = 0,
++        data_parallel_rank: Optional[int] = None,
++    ) -> tuple[Optional[str], EngineCoreRequest]:
++
++        # TODO(woosuk): Support pooling models.
++        self._validate_lora(lora_request)
++        self._validate_params(params)
++
++        data_parallel_size = self.vllm_config.parallel_config.data_parallel_size
++        if data_parallel_rank is not None and not (0 <= data_parallel_rank <
++                                                   data_parallel_size):
++            raise ValueError(f"data_parallel_rank {data_parallel_rank} "
++                             f"is out of range [0, {data_parallel_size}).")
++
++        if arrival_time is None:
++            arrival_time = time.time()
++
++        # Optionally generate multimodal hash overrides to avoid hashing
++        # multimodal data items by their content as their identifiers.
++
++        # NOTE: when users explicitly turn off BOTH prefix caching and input
++        # processing caching, no multimodal features or embeddings will be
++        # reused across requests, therefore identifying multimodal data items
++        # by their content is no longer necessary, and we create uuids with
++        # request id-modality-index as multimodal hash overrides.
++        if (self.model_config.multimodal_config and
++                self.model_config.multimodal_config.mm_processor_cache_gb == 0
++                and not self.cache_config.enable_prefix_caching):
++            mm_uuids = self._maybe_build_mm_uuids(request_id, prompt)
++        else:
++            # Otherwise, use user-provided uuids as multimodal hash overrides
++            # if provided.
++            self._validate_multi_modal_uuids(prompt)
++            if isinstance(prompt, dict):
++                mm_uuids = prompt.get("multi_modal_uuids")
++            else:
++                mm_uuids = None
++
++        # Process inputs, which includes:
++        # 1. Tokenize text prompt, with LoRA request if one exists.
++        # 2. For multimodal models with a merged preprocessor, preprocess
++        #   multimodal data and expand prompt token ids accordingly.
++        processed_inputs: ProcessorInputs = self.input_preprocessor.preprocess(
++            prompt,
++            tokenization_kwargs=tokenization_kwargs,
++            mm_uuids=mm_uuids,
++        )
++        from vllm.platforms import current_platform
++        current_platform.validate_request(
++            prompt=prompt,
++            params=params,
++            processed_inputs=processed_inputs,
++        )
++
++        eos_token_id = self.input_preprocessor.get_eos_token_id()
++
++        encoder_inputs, decoder_inputs = split_enc_dec_inputs(processed_inputs)
++        self._validate_model_inputs(encoder_inputs, decoder_inputs)
++
++        # Mypy does not always properly infer the types of some elements of
++        # discriminated unions of TypedDicts, because of how it handles
++        # inheritance of TypedDict. If we explicitly extract the items we want
++        # we can avoid type errors from using `dict.get` later in the method.
++        assert decoder_inputs["type"] not in ["embeds", "multimodal"]
++        assert isinstance(params, SamplingParams)
++
++        prompt_str: Optional[str] = decoder_inputs.get("prompt")
++        prompt_token_ids = decoder_inputs["prompt_token_ids"]
++        prompt_embeds = None
++
++        # uncond_prompt_str: Optional[str] = decoder_inputs.get("uncond_prompt")
++        uncond_prompt_token_ids: Optional[list] = decoder_inputs.get("uncond_prompt_token_ids")
++        visual_prompt_token_ids: Optional[list] = decoder_inputs.get("visual_prompt_token_ids")
++
++        # TODO: can we avoid cloning here in multiproc case?
++        sampling_params = params.clone()
++        # If unset max tokens, then generate up to the max_model_len.
++        if sampling_params.max_tokens is None:
++            seq_len = length_from_prompt_token_ids_or_embeds(
++                prompt_token_ids, prompt_embeds)
++            sampling_params.max_tokens = \
++                self.model_config.max_model_len - seq_len
++        sampling_params.update_from_generation_config(
++            self.generation_config_fields, eos_token_id)
++        if self.tokenizer is not None:
++            sampling_params.update_from_tokenizer(self.tokenizer)
++
++        def create_core_req(prompt_token_ids):
++            return EngineCoreRequest(
++                request_id=request_id,
++                prompt_token_ids=prompt_token_ids,
++                sampling_params=sampling_params,
++                prompt_embeds=prompt_embeds,
++                mm_features=None,
++                pooling_params=None,
++                eos_token_id=eos_token_id,
++                arrival_time=arrival_time,
++                lora_request=lora_request,
++                cache_salt=decoder_inputs.get("cache_salt"),
++                priority=priority,
++                data_parallel_rank=data_parallel_rank,
++                trace_headers=trace_headers,
++            )
++
++        core_reqs = []
++        for token_ids in [prompt_token_ids, uncond_prompt_token_ids, visual_prompt_token_ids]:
++            if token_ids is None: continue
++            core_reqs.append(create_core_req(token_ids))
++
++        return prompt_str, core_reqs
++
+     def _validate_model_inputs(self, encoder_inputs: Optional[SingletonInputs],
+                                decoder_inputs: SingletonInputs):
+         if encoder_inputs is not None:

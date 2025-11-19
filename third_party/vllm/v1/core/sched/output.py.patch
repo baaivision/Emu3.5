@@ -1,0 +1,53 @@
+diff --git a/vllm/v1/core/sched/output.py b/vllm/v1/core/sched/output.py
+index 209fc2a44..0d0e70a1b 100644
+--- a/vllm/v1/core/sched/output.py
++++ b/vllm/v1/core/sched/output.py
+@@ -20,6 +20,7 @@ if TYPE_CHECKING:
+     from vllm.pooling_params import PoolingParams
+     from vllm.sampling_params import SamplingParams
+     from vllm.v1.request import Request
++    from vllm.v1.core.sched.batch_manager import HybridSchedulerMetadata
+ 
+ 
+ @bc_linter_include
+@@ -35,12 +36,14 @@ class NewRequestData:
+     num_computed_tokens: int
+     lora_request: Optional[LoRARequest]
+     prompt_embeds: Optional[torch.Tensor] = None
++    hybrid_metadata: Optional[HybridSchedulerMetadata] = None
+ 
+     @classmethod
+     def from_request(
+         cls,
+         request: Request,
+         block_ids: tuple[list[int], ...],
++        hybrid_metadata: Optional[HybridSchedulerMetadata] = None,
+     ) -> NewRequestData:
+         return cls(
+             req_id=request.request_id,
+@@ -52,6 +55,7 @@ class NewRequestData:
+             num_computed_tokens=request.num_computed_tokens,
+             lora_request=request.lora_request,
+             prompt_embeds=request.prompt_embeds,
++            hybrid_metadata=hybrid_metadata,
+         )
+ 
+     def __repr__(self) -> str:
+@@ -101,6 +105,8 @@ class CachedRequestData:
+     new_token_ids: list[list[int]]
+     new_block_ids: list[Optional[tuple[list[int], ...]]]
+     num_computed_tokens: list[int]
++    sampling_params: list[SamplingParams]
++    hybrid_metadata: list[HybridSchedulerMetadata]
+ 
+     @property
+     def num_reqs(self) -> int:
+@@ -114,6 +120,8 @@ class CachedRequestData:
+             new_token_ids=[],
+             new_block_ids=[],
+             num_computed_tokens=[],
++            sampling_params=[],
++            hybrid_metadata=[],
+         )
+ 
+ 

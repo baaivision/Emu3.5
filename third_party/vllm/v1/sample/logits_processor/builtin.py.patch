@@ -1,0 +1,117 @@
+diff --git a/vllm/v1/sample/logits_processor/builtin.py b/vllm/v1/sample/logits_processor/builtin.py
+index fc655d993..133579e59 100644
+--- a/vllm/v1/sample/logits_processor/builtin.py
++++ b/vllm/v1/sample/logits_processor/builtin.py
+@@ -9,6 +9,7 @@ from vllm import SamplingParams
+ from vllm.v1.sample.logits_processor.interface import (BatchUpdate,
+                                                        LogitsProcessor,
+                                                        MoveDirectionality)
++from vllm.v1.core.sched.batch_manager import HybridSchedulerMetadata
+ 
+ if TYPE_CHECKING:
+     from vllm.config import VllmConfig
+@@ -54,7 +55,7 @@ class MinPLogitsProcessor(LogitsProcessor):
+ 
+         needs_update = False
+         # Process added requests.
+-        for index, params, _, _ in batch_update.added:
++        for index, params, _, _, _ in batch_update.added:
+             min_p = params.min_p
+             min_p_before = self.min_p_cpu[index]
+             if min_p_before != min_p:
+@@ -245,7 +246,7 @@ def process_dict_updates(
+         return False
+ 
+     updated = False
+-    for index, params, prompt_tok_ids, output_tok_ids in batch_update.added:
++    for index, params, prompt_tok_ids, output_tok_ids, _ in batch_update.added:
+         if (state := new_state(params, prompt_tok_ids,
+                                output_tok_ids)) is not None:
+             req_entries[index] = state
+@@ -273,3 +274,86 @@ def process_dict_updates(
+                     req_entries[a_index] = b_entry
+ 
+     return updated
++
++
++class ClassifierFreeGuidanceLogitsForVisualTokenProcessor(LogitsProcessor):
++    def __init__(self, vllm_config: "VllmConfig", device: torch.device,
++                 is_pin_memory: bool):
++        self.device = device
++        self.pin_memory = is_pin_memory
++        self.visual_token_start_index = 151854
++
++        self.metadata: dict[int, HybridSchedulerMetadata] = {}
++        self.guidance_scale: dict[int, int] = {}
++        self.activated = False
++
++    def update_state(self, batch_update: Optional[BatchUpdate]):
++        if not batch_update:
++            return
++
++        for index, params, _, _, metadata in batch_update.added:
++            guidance_scale = params.extra_args.get("guidance_scale", None)
++            if metadata is None or guidance_scale is None:
++                continue
++            self.activated = True
++            self.metadata[index] = metadata
++            self.guidance_scale[index] = guidance_scale
++
++        if self.activated is True:
++            for index in batch_update.removed:
++                self.metadata.pop(index, None)
++                self.guidance_scale.pop(index, None)
++
++            for i1, i2, direct in batch_update.moved:
++                if direct == MoveDirectionality.SWAP:
++                    self.metadata[i1], self.metadata[i2] = self.metadata[i2], self.metadata[i1]
++                    self.guidance_scale[i1], self.guidance_scale[i2] = \
++                        self.guidance_scale[i2], self.guidance_scale[i1]
++                if direct == MoveDirectionality.UNIDIRECTIONAL:
++                    self.metadata[i2] = self.metadata.pop(i1, None)
++                    self.guidance_scale[i2] = self.guidance_scale.pop(i1, 1.0)
++
++            for index, params, metadata in batch_update.updated:
++                self.metadata[index] = metadata
++
++    def is_argmax_invariant(self) -> bool:
++        return True
++
++    def apply(self, logits):
++
++        if not self.metadata:
++            return logits
++
++        indices = list(self.metadata.keys())
++        if logits.shape[0] != len(indices) or logits.shape[0] % 2 != 0:
++            return logits
++
++        for i in range(0, len(indices), 2):
++            format_token_ids = self.metadata[i].format_token_ids
++            in_visual = self.metadata[i].in_visual
++            in_image = self.metadata[i].in_image
++            guidance_scale = self.guidance_scale[i]
++            if len(format_token_ids) > 0:
++                mask = torch.ones_like(logits[i], dtype=torch.bool)
++                mask[format_token_ids] = False
++                logits[i].masked_fill_(mask, float("-inf"))
++            elif in_image and in_visual:
++                cond_logits = torch.nn.functional.log_softmax(logits[i], dim=-1)
++                uncond_logits = torch.nn.functional.log_softmax(logits[i+1], dim=-1)
++                guided_logits = uncond_logits + guidance_scale * (cond_logits - uncond_logits)
++                logits[i] = guided_logits
++                # logits[i+1] = guided_logits
++                mask = torch.ones_like(logits[i], dtype=torch.bool)
++                mask[self.visual_token_start_index:] = False
++                logits[i].masked_fill_(mask, float("-inf"))
++            elif in_image and not in_visual:
++                top1_idx = torch.argmax(logits[i], dim=-1, keepdim=True)
++                mask = torch.ones_like(logits[i], dtype=torch.bool)
++                mask.scatter_(dim=-1, index=top1_idx, value=False)
++                logits[i].masked_fill_(mask, float("-inf"))
++            elif not in_image and not in_visual:
++                mask = torch.ones_like(logits[i], dtype=torch.bool)
++                mask[:self.visual_token_start_index] = False
++                logits[i].masked_fill_(mask, float("-inf"))
++
++        return logits

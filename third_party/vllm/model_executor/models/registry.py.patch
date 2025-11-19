@@ -1,0 +1,12 @@
+diff --git a/vllm/model_executor/models/registry.py b/vllm/model_executor/models/registry.py
+index e1fc7e11a..6b8718b88 100644
+--- a/vllm/model_executor/models/registry.py
++++ b/vllm/model_executor/models/registry.py
+@@ -215,6 +215,7 @@ _CROSS_ENCODER_MODELS = {
+ 
+ _MULTIMODAL_MODELS = {
+     # [Decoder-only]
++    "Emu3ForCausalLM": ("emu3_5", "Emu3_5ForCausalLM"),
+     "AriaForConditionalGeneration": ("aria", "AriaForConditionalGeneration"),
+     "AyaVisionForConditionalGeneration": ("aya_vision", "AyaVisionForConditionalGeneration"),  # noqa: E501
+     "Blip2ForConditionalGeneration": ("blip2", "Blip2ForConditionalGeneration"),

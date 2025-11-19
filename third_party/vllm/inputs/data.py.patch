@@ -1,0 +1,52 @@
+diff --git a/vllm/inputs/data.py b/vllm/inputs/data.py
+index 1718c0767..3e69e512c 100644
+--- a/vllm/inputs/data.py
++++ b/vllm/inputs/data.py
+@@ -45,6 +45,9 @@ class TextPrompt(TypedDict):
+     Optional cache salt to be used for prefix caching.
+     """
+ 
++    uncond_prompt: NotRequired[Optional[str]]
++    """The uncond input text to be tokenized before passing to the model."""
++
+ 
+ class TokensPrompt(TypedDict):
+     """Schema for a tokenized prompt."""
+@@ -85,6 +88,9 @@ class TokensPrompt(TypedDict):
+     Optional cache salt to be used for prefix caching.
+     """
+ 
++    uncond_prompt_token_ids: NotRequired[Optional[list[int]]]
++    """A list of token IDs to pass to the model for the uncond input."""
++
+ 
+ class EmbedsPrompt(TypedDict):
+     """Schema for a prompt provided via token embeddings."""
+@@ -215,18 +221,26 @@ class TokenInputs(TypedDict):
+     Optional cache salt to be used for prefix caching.
+     """
+ 
++    uncond_prompt_token_ids: NotRequired[Optional[list[int]]]
++    uncond_prompt: NotRequired[Optional[str]]
++
+ 
+ def token_inputs(
+     prompt_token_ids: list[int],
+     prompt: Optional[str] = None,
+     cache_salt: Optional[str] = None,
++    uncond_prompt_token_ids: Optional[list[int]] = None,
++    uncond_prompt: Optional[str] = None,
+ ) -> TokenInputs:
+     """Construct [`TokenInputs`][vllm.inputs.data.TokenInputs] from optional
+     values."""
+-    inputs = TokenInputs(type="token", prompt_token_ids=prompt_token_ids)
++    inputs = TokenInputs(type="token", prompt_token_ids=prompt_token_ids,
++                         uncond_prompt_token_ids=uncond_prompt_token_ids)
+ 
+     if prompt is not None:
+         inputs["prompt"] = prompt
++    if uncond_prompt is not None:
++        inputs["uncond_prompt"] = uncond_prompt
+     if cache_salt is not None:
+         inputs["cache_salt"] = cache_salt
+ 
