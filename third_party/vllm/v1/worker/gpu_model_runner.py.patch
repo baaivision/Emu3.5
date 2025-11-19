@@ -1,0 +1,129 @@
+diff --git a/vllm/v1/worker/gpu_model_runner.py b/vllm/v1/worker/gpu_model_runner.py
+index a438c7777..fd3566d73 100644
+--- a/vllm/v1/worker/gpu_model_runner.py
++++ b/vllm/v1/worker/gpu_model_runner.py
+@@ -125,6 +125,23 @@ AttnMetadataDict: TypeAlias = dict[str, AttentionMetadata]
+ PerLayerAttnMetadata: TypeAlias = Union[list[AttnMetadataDict],
+                                         AttnMetadataDict]
+ 
++# --- FLAGSCALE MODIFICATION BEG ---
++# Know more about FlagGems: https://github.com/FlagOpen/FlagGems  
++import os
++if os.getenv("USE_FLAGGEMS", "false").lower() in ("1", "true", "yes"):
++    try:
++        print("Try to using FLAGGEMS...")
++        import flag_gems
++        flag_gems.enable(record=True, unused=["exponential_", "softmax"], path="/tmp/gems_oplist.log.txt")
++        logger.info("Successfully enabled flag_gems as default ops implementation.")
++    except ImportError as e:
++        # Throw an exception directly if failure occurs
++        raise ImportError("Failed to import 'flag_gems'. Please install flag_gems or set USE_FLAGGEMS=false to disable it.") from e
++    except Exception as e:
++        # Throw an exception directly if failure occurs
++        raise RuntimeError(f"Failed to enable 'flag_gems': {e}. Please check your flag_gems installation or set USE_FLAGGEMS=false to disable it.") from e
++# --- FLAGSCALE MODIFICATION END ---
++
+ 
+ # Wrapper for ModelRunnerOutput to support overlapped execution.
+ class AsyncGPUModelRunnerOutput(AsyncModelRunnerOutput):
+@@ -570,6 +587,7 @@ class GPUModelRunner(LoRAModelRunnerMixin, KVConnectorModelRunnerMixin):
+             req_id = new_req_data.req_id
+             sampling_params = new_req_data.sampling_params
+             pooling_params = new_req_data.pooling_params
++            hybrid_metadata = new_req_data.hybrid_metadata
+ 
+             if sampling_params and \
+                 sampling_params.sampling_type == SamplingType.RANDOM_SEED:
+@@ -599,6 +617,7 @@ class GPUModelRunner(LoRAModelRunnerMixin, KVConnectorModelRunnerMixin):
+                 num_computed_tokens=new_req_data.num_computed_tokens,
+                 output_token_ids=[],
+                 lora_request=new_req_data.lora_request,
++                hybrid_metadata=hybrid_metadata,
+             )
+             self.requests[req_id] = req_state
+ 
+@@ -616,25 +635,28 @@ class GPUModelRunner(LoRAModelRunnerMixin, KVConnectorModelRunnerMixin):
+             num_computed_tokens = req_data.num_computed_tokens[i]
+             new_block_ids = req_data.new_block_ids[i]
+             resumed_from_preemption = req_data.resumed_from_preemption[i]
++            req_state.sampling_params = req_data.sampling_params[i]
++            req_state.hybrid_metadata = req_data.hybrid_metadata[i]
+ 
+             # Update the cached states.
+             req_state.num_computed_tokens = num_computed_tokens
+ 
+-            if not is_last_rank:
+-                # When using PP, the scheduler sends the sampled tokens back,
+-                # because there's no direct communication between the first-
+-                # stage worker and the last-stage worker.
+-                new_token_ids = req_data.new_token_ids[i]
+-                # Add the sampled token(s) from the previous step (if any).
+-                # This doesn't include "unverified" tokens like spec tokens.
+-                num_new_tokens = (num_computed_tokens + len(new_token_ids) -
+-                                  req_state.num_tokens)
+-                if num_new_tokens == 1:
+-                    # Avoid slicing list in most common case.
+-                    req_state.output_token_ids.append(new_token_ids[-1])
+-                elif num_new_tokens > 0:
+-                    req_state.output_token_ids.extend(
+-                        new_token_ids[-num_new_tokens:])
++            # NOTE(zhaoyinglia): emu must use token_ids from schdeuled_output
++            # if not is_last_rank:
++            # When using PP, the scheduler sends the sampled tokens back,
++            # because there's no direct communication between the first-
++            # stage worker and the last-stage worker.
++            new_token_ids = req_data.new_token_ids[i]
++            # Add the sampled token(s) from the previous step (if any).
++            # This doesn't include "unverified" tokens like spec tokens.
++            num_new_tokens = (num_computed_tokens + len(new_token_ids) -
++                                req_state.num_tokens)
++            if num_new_tokens == 1:
++                # Avoid slicing list in most common case.
++                req_state.output_token_ids.append(new_token_ids[-1])
++            elif num_new_tokens > 0:
++                req_state.output_token_ids.extend(
++                    new_token_ids[-num_new_tokens:])
+ 
+             # Update the block IDs.
+             if not resumed_from_preemption:
+@@ -664,18 +686,30 @@ class GPUModelRunner(LoRAModelRunnerMixin, KVConnectorModelRunnerMixin):
+                 self.input_batch.block_table.append_row(
+                     new_block_ids, req_index)
+ 
++            if req_data.hybrid_metadata is not None:
++                self.input_batch.batch_update_builder.updated.append(
++                    (req_index, req_state.sampling_params, req_state.hybrid_metadata))
++
+             # For the last rank, we don't need to update the token_ids_cpu
+             # because the sampled tokens are already cached.
+-            if not is_last_rank:
+-                # Add new_token_ids to token_ids_cpu.
+-                start_token_index = num_computed_tokens
+-                end_token_index = num_computed_tokens + len(new_token_ids)
+-                self.input_batch.token_ids_cpu[
+-                    req_index,
+-                    start_token_index:end_token_index] = new_token_ids
+-                self.input_batch.num_tokens_no_spec[
+-                    req_index] = end_token_index
+-                self.input_batch.num_tokens[req_index] = end_token_index
++            # NOTE(zhaoyinglia): emu must use token_ids from schdeuled_output
++            # if not is_last_rank:
++            # Add new_token_ids to token_ids_cpu.
++            start_token_index = num_computed_tokens
++            end_token_index = num_computed_tokens + len(new_token_ids)
++            self.input_batch.token_ids_cpu[
++                req_index,
++                start_token_index:end_token_index] = new_token_ids
++            self.input_batch.num_tokens_no_spec[
++                req_index] = end_token_index
++            self.input_batch.num_tokens[req_index] = end_token_index
++            # NOTE(zhaoyinglia): Update topk/topp/temp, cause different token type needs different value
++            self.input_batch.top_k_cpu[req_index] = req_state.sampling_params.top_k
++            self.input_batch.top_p_cpu[req_index] = req_state.sampling_params.top_p
++            self.input_batch.temperature_cpu[req_index] = req_state.sampling_params.temperature
++            self.input_batch.top_k[req_index] = req_state.sampling_params.top_k
++            self.input_batch.top_p[req_index] = req_state.sampling_params.top_p
++            self.input_batch.temperature[req_index] = req_state.sampling_params.temperature
+ 
+             # Add spec_token_ids to token_ids_cpu.
+             spec_token_ids = (
