@@ -64,7 +64,7 @@ Emu3.5 Team, BAAI
 ### Environment Setup
 
 ```bash
-# Python 3.10 or higher is required.
+# Requires Python 3.12 or higher.
 git clone https://github.com/baaivision/Emu3.5
 cd Emu3.5
 pip install -r requirements/transformers.txt
@@ -117,7 +117,15 @@ Protobuf outputs are written to `outputs/<exp_name>/proto/`. For better throughp
 
 #### vLLM Enviroment Setup
 
+1. [Optional Recommendation] Use a virtual environment
 ```bash
+conda create -n Emu3p5 python=3.12
+```
+
+2. Install vLLM and apply the patch files.
+```bash
+# Requires Python 3.12 or higher.
+# Recommended: CUDA 12.8.
 pip install -r requirements/vllm.txt
 pip install flash_attn==2.8.3 --no-build-isolation
 
