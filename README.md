@@ -31,16 +31,18 @@ Emu3.5 Team, BAAI
 
 
 
+## 🔥 News
+
+- **2025-11-19 · 🚀 vLLM Offline Inference Released** — Meet `inference_vllm.py` with a new cond/uncond batch scheduler, delivering **4–5× faster end-to-end generation** on vLLM 0.11.0 across Emu3.5 tasks. Jump to [#Run Inference with vLLM](#run-inference-with-vllm) for setup guidance and see PR [#47](https://github.com/baaivision/Emu3.5/pull/47) for full details.
+- **2025-11-17 · 🎛️ Gradio Demo (Transformers Backend)** — Introduced `gradio_demo_image.py` and `gradio_demo_interleave.py` presets for the standard Transformers runtime, providing turnkey T2I/X2I and interleaved generation experiences with streaming output. Try the commands in [#Gradio Demo](#3-gradio-demo) to launch both UIs locally.
+
 ## Table of Contents
 
 1. [Model & Weights](#1-model--weights)
 2. [Quick Start](#2-quick-start)
-3. [Schedule](#3-schedule)
-4. [Citation](#4-citation)
-
-## 🔥 News
-
-- **2025-11-19 · 🚀 vLLM Offline Inference Released** — Meet `inference_vllm.py` with a new cond/uncond batch scheduler, delivering **4–5× faster end-to-end generation** on vLLM 0.11.0 across Emu3.5 tasks. Jump to [#Run Inference with vLLM](#run-inference-with-vllm) for setup guidance and see PR [#47](https://github.com/baaivision/Emu3.5/pull/47) for full details.
+3. [Gradio Demo](#3-gradio-demo)
+4. [Schedule](#4-schedule)
+5. [Citation](#5-citation)
 
 ## 1. Model & Weights
 
@@ -121,7 +123,7 @@ Protobuf outputs are written to `outputs/<exp_name>/proto/`. For better throughp
 
 #### vLLM Enviroment Setup
 
-1. [Optional Recommendation] Use a virtual environment
+1. [Optional Recommendation] Use a new virtual environment for vLLM backend.
 ```bash
 conda create -n Emu3p5 python=3.12
 ```
