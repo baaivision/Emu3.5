@@ -1,0 +1,7 @@
+-r common.txt
+
+torch>=2.6.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+transformers==4.48.2
+accelerate>=0.20.0

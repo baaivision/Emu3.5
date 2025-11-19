@@ -67,7 +67,7 @@ Emu3.5 Team, BAAI
 # Python 3.10 or higher is required.
 git clone https://github.com/baaivision/Emu3.5
 cd Emu3.5
-pip install -r requirements.txt
+pip install -r requirements/transformers.txt
 pip install flash_attn==2.8.3 --no-build-isolation
 ```
 ### Configuration
@@ -118,7 +118,8 @@ Protobuf outputs are written to `outputs/<exp_name>/proto/`. For better throughp
 #### vLLM Enviroment Setup
 
 ```bash
-pip install vllm==0.11.0 # Make sure to install vllm version 0.11.0.
+pip install -r requirements/vllm.txt
+pip install flash_attn==2.8.3 --no-build-isolation
 
 cd Emu3.5
 python src/patch/apply.py
