@@ -38,6 +38,10 @@ Emu3.5 Team, BAAI
 3. [Schedule](#3-schedule)
 4. [Citation](#4-citation)
 
+## 🔥 News
+
+- **2025-11-19 · 🚀 vLLM Offline Inference Released** — Meet `inference_vllm.py` with a new cond/uncond batch scheduler, delivering **4–5× faster end-to-end generation** on vLLM 0.11.0 across Emu3.5 tasks. Jump to [#Run Inference with vLLM](#run-inference-with-vllm) for setup guidance and see PR [#47](https://github.com/baaivision/Emu3.5/pull/47) for full details.
+
 ## 1. Model & Weights
 
 | Model name               | HF Weight |

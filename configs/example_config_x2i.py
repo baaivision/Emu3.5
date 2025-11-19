@@ -8,7 +8,7 @@ cfg_name = Path(__file__).stem
 model_path = "path_to_emu3.5_model" # download from hf
 vq_path = "path_to_vq_model" # download from hf
 
-tokenizer_path = "./src/tokenizer_emu3_ibq"
+tokenizer_path = "path_to_tokenizer"
 vq_type = "ibq"
 
 task_type = "x2i"
