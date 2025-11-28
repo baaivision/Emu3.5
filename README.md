@@ -7,6 +7,9 @@ Emu3.5 Team, BAAI
 </div>
 
 
+> 🔔 **Latest**: Emu3.5 Web & Mobile Apps and vLLM offline inference are live — see [🔥 News](#-news) for details.
+
+
 <div align='center'>
 <img src="./assets/arch.png" class="interpolation-image" alt="arch." height="100%" width="100%" />
 </div>
@@ -33,6 +36,7 @@ Emu3.5 Team, BAAI
 
 ## 🔥 News
 
+- **2025-11-28 · 🌐 Emu3.5 Web & Mobile Apps Live** — Official product experience is **now available** on the web at [zh.emu.world](https://zh.emu.world) (Mainland China) and [emu.world](https://emu.world) (global) 🎉 The new homepage highlights featured cases and a “Get Started” entry, while the workspace and mobile apps bring together creation, inspiration feed, history, profile, and language switch across web, Android APK, and H5. *([See more details](#official-web--mobile-apps) below.)*
 - **2025-11-19 · 🚀 vLLM Offline Inference Released** — Meet `inference_vllm.py` with a new cond/uncond batch scheduler, delivering **4–5× faster end-to-end generation** on vLLM 0.11.0 across Emu3.5 tasks. Jump to [#Run Inference with vLLM](#run-inference-with-vllm) for setup guidance and see PR [#47](https://github.com/baaivision/Emu3.5/pull/47) for full details.
 - **2025-11-17 · 🎛️ Gradio Demo (Transformers Backend)** — Introduced `gradio_demo_image.py` and `gradio_demo_interleave.py` presets for the standard Transformers runtime, providing turnkey T2I/X2I and interleaved generation experiences with streaming output. Try the commands in [#Gradio Demo](#3-gradio-demo) to launch both UIs locally.
 
@@ -206,6 +210,33 @@ CUDA_VISIBLE_DEVICES=0,1 python gradio_demo_interleave.py --host 0.0.0.0 --port 
 - Multiple Aspect Ratios for T2I: 9 preset aspect ratios (4:3, 16:9, 1:1, etc.) plus auto mode
 - Chain-of-Thought Display: Automatically parse and format model's internal thinking process
 - Real-time Streaming: Stream text and image generation with live updates
+
+### Official Web & Mobile Apps
+
+- **Web**: Production-ready Emu3.5 experience is available at [zh.emu.world](https://zh.emu.world) (Mainland China) and [emu.world](https://emu.world) (global), featuring a curated homepage, “Create” workspace, inspiration feed, history, personal profile, and language switching.
+- **Mobile (Android APK & H5)**: Mobile clients provide the same core flows — prompt-based creation, “inspiration” gallery, personal center, and feedback & privacy entrypoints — with automatic UI language selection based on system settings.
+- **Docs**: For product usage details, see the **Emu3.5 AI 使用指南 (Chinese)** and **Emu3.5 AI User Guide (English)**:  
+  - CN: [Emu3.5 AI 使用指南](https://jwolpxeehx.feishu.cn/wiki/BKuKwkzZOi4pdRkVV13csI0FnIg?from=from_copylink)  
+  - EN: [Emu3.5 AI User Guide](https://jwolpxeehx.feishu.cn/wiki/Gcxtw9XHhisUu8kBEaac6s6xnhc?from=from_copylink)
+
+#### Mobile App Download (QR Codes)
+
+<div align='center'>
+  <table>
+    <tr>
+      <td align="center">
+        <img src="./assets/qr_zh.png" alt="Emu3.5 Mobile App (Mainland China)" width="220" />
+        <br />
+        <sub><b>Emu3.5 Mobile · Mainland China</b></sub>
+      </td>
+      <td align="center">
+        <img src="./assets/qr.png" alt="Emu3.5 Mobile App (Global)" width="220" />
+        <br />
+        <sub><b>Emu3.5 Mobile · Global</b></sub>
+      </td>
+    </tr>
+  </table>
+</div>
 
 
 
