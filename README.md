@@ -3,7 +3,7 @@
 
 Emu3.5 Team, BAAI
 
-[Project Page](https://emu.world/) | [🤗HF Models](https://huggingface.co/collections/BAAI/emu35) | [Paper](https://arxiv.org/pdf/2510.26583)
+[Project Page](https://emu.world/pages/web/landingPage) | [🤗HF Models](https://huggingface.co/collections/BAAI/emu35) | [Paper](https://arxiv.org/pdf/2510.26583) | [App](https://emu.world/pages/web/home?route=index)
 </div>
 
 
