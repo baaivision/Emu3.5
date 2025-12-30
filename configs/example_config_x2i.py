@@ -5,8 +5,8 @@ from pathlib import Path
 from src.utils.logging_utils import setup_logger
 cfg_name = Path(__file__).stem
 
-model_path = "path_to_emu3.5_model" # download from hf
-vq_path = "path_to_vq_model" # download from hf
+model_path = "BAAI/Emu3.5-Image" # download from hf
+vq_path = "BAAI/Emu3.5-VisionTokenizer" # download from hf
 
 tokenizer_path = "path_to_tokenizer"
 vq_type = "ibq"

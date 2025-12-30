@@ -5,8 +5,8 @@ from pathlib import Path
 from src.utils.logging_utils import setup_logger
 cfg_name = Path(__file__).stem
 
-model_path = "./weights/Emu3.5-image" # download from hf
-vq_path = "./weights/Emu3.5-VisionTokenizer" # download from hf
+model_path = "BAAI/Emu3.5-Image" # download from hf
+vq_path = "BAAI/Emu3.5-VisionTokenizer" # download from hf
 
 tokenizer_path = "./src/tokenizer_emu3_ibq"
 vq_type = "ibq"
@@ -26,7 +26,7 @@ hf_device = "auto"
 vq_device = "cuda:0"
 streaming = False
 unconditional_type = "no_text"
-classifier_free_guidance = 5.0
+classifier_free_guidance = 5.0 # For Emu3.5 model: we recommend set to 2
 max_new_tokens = 5120
 image_area = 1048576
 
