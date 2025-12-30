@@ -7,7 +7,7 @@ Emu3.5 Team, BAAI
 </div>
 
 
-> 🔔 **Latest**: Emu3.5 Web & Mobile Apps and vLLM offline inference are live — see [🔥 News](#-news) for details.
+> 🔔 **Latest**: Emu3.5 Web & Mobile Apps and vLLM offline inference are live — see [🔥 News](#news) for details.
 
 
 <div align='center'>
@@ -33,6 +33,7 @@ Emu3.5 Team, BAAI
 |  🏆 | **Performance Benchmark**                | Matches **Gemini 2.5 Flash Image (Nano Banana)** on **image generation/editing**, and **outperforms** on **interleaved generation tasks**. |
 
 
+<a id="news"></a>
 
 ## 🔥 News
 
@@ -85,6 +86,14 @@ pip install flash_attn==2.8.3 --no-build-isolation
 Edit `configs/config.py` to set:
 
 - Paths: `model_path`, `vq_path`
+  You can use either a **local path** (e.g., downloaded HuggingFace weights) or a **remote HuggingFace Hub ID** for automatic download:
+  ```python
+  vq_path = "BAAI/Emu3.5-VisionTokenizer"  # remote, auto-download
+  model_path = "BAAI/Emu3.5"               # remote, auto-download
+  # or
+  vq_path = "/path/to/local/Emu3.5-VisionTokenizer"  # local path
+  model_path = "/path/to/local/Emu3.5"               # local path
+  ```
 - Task template: `task_type in {t2i, x2i, howto, story, explore, vla}`
 - Input image: `use_image` (True to provide reference images, controls <|IMAGE|> token); set `reference_image` in each prompt to specify the image path. For x2i task, we recommand using `reference_image` as a list containing single/multiple image paths to be compatible with multi-image input.
 - Sampling: `sampling_params` (classifier_free_guidance, temperature, top_k/top_p, etc.)
